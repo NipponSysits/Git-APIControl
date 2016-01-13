@@ -1,6 +1,13 @@
 {
   "name": "api-dev.ns.co.th",
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "mongodb": "^2.1.4",
+    "connect-url-rewrite": "^0.1.0",
+    "ejs": "^2.3.4",
+    "ejs-mate": "^2.3.0",
+    "google-auth-library": "^0.9.7",
+    "googleapis": "^2.1.7",
+    "monk": "^0.1.4"
   }
 }
