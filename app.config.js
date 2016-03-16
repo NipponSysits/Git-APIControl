@@ -1,38 +1,24 @@
 module.exports = {
 	dev: {
-		ip: '127.0.0.1',
-		port: 8220,
-		mongo_db: {
-			domain: 'touno-k.noip.me',
-			dbname: 'store_anime',
-			access: {
-				username: 'root',
-				password: '123456'
-			},
-			port: 27017
-		},
-		mysql_db: {
-			username: 'root',
+		ip: '0.0.0.0',
+		port: 8100,
+		mysql: {
+			host: 'localhost',
+			user: 'root',
+			port: 3306,
 			password: '123456',
-			port: 3301
+			database: 'ns_dev'
 		}
 	},
 	serv: {
-		ip: '10.0.1.21',
-		port: 8220,
-		mongo_db: {
-			domain: 'touno-k.noip.me',
-			dbname: 'store_anime',
-			access: {
-				username: 'root',
-				password: '123456'
-			},
-			port: 27017
-		},
-		mysql_db: {
-			username: 'root',
+		ip: '0.0.0.0',
+		port: 810,
+		mysql: {
+			host: 'localhost',
+			user: 'root',
+			port: 3306,
 			password: '123456',
-			port: 3301
+			database: 'ns_dev'
 		}
 	}
 }

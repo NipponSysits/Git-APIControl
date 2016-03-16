@@ -1,13 +1,30 @@
 {
-  "name": "api-dev.ns.co.th",
+  "name": "PGM-DevControl",
+  "description": "SourceCode Control ",
+  "version": "0.0.1",
+  "private": true,
   "dependencies": {
     "express": "^4.13.3",
-    "mongodb": "^2.1.4",
-    "connect-url-rewrite": "^0.1.0",
-    "ejs": "^2.3.4",
-    "ejs-mate": "^2.3.0",
-    "google-auth-library": "^0.9.7",
-    "googleapis": "^2.1.7",
-    "monk": "^0.1.4"
+    "git-server": "^0.2.0",
+    "md5": "^2.0.0",
+    "methods": "^1.1.2",
+    "moment": "^2.11.1",
+    "moment-precise-range": "^0.1.1",
+    "mysql": "^2.10.2",
+    "mysql-wrap": "^0.5.3",
+    "nodegit": "^0.11.9",
+    "q": "^1.4.1",
+    "simple-encryptor": "^1.0.3"
+  },
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js --dev"
+  },
+  "author": "Touno.K",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "1.0"
   }
 }
