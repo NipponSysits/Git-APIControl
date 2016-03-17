@@ -82,5 +82,5 @@ db.select('url').then(function(rows){
 //   console.log(found);
 
 // });
-console.log("Server listen on "+config.port);
-server.listen(config.port);
+console.log("Git SourceControl listen on "+config.git);
+server.listen(config.git);
