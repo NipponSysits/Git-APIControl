@@ -1,6 +1,5 @@
-process.env['PATH'] = process.env['PATH']+';C:\\Program Files\\Git\\mingw64\\libexec\\git-core'
-
 var http = require('http');
+var q = require('q');
 var moment = require('moment');
 var repos = require('pushover')(__dirname+'/tmp', { autoCreate: false });
 
@@ -8,6 +7,8 @@ var config = require("./app.config");
 var api = require("./libs/api");
 var auth = require("./libs/auth");
 var conn = require("./libs/db");
+
+process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
 
 var permissableMethod = function(creds, req, res) {
   repos.handle(req, res); 
@@ -45,7 +46,7 @@ repos.on('tag', function (tag) {
 });
 
 var db = conn.connect();
-db.select('url').then(function(rows){
+db.select('url', {}, function(err, rows, fields){
   rows.forEach(function(row){
     var git = /\/(.*)\/(.*)/.exec(row.url);
     repos.exists(row.url, function(found){
@@ -72,7 +73,7 @@ db.select('url').then(function(rows){
 // });
 
 git.listen(config.git, function() {
-    console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
+  console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
 });
 
 api.listen(config.api, function() {
