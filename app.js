@@ -1,42 +1,30 @@
 process.env['PATH'] = process.env['PATH']+';C:\\Program Files\\Git\\mingw64\\libexec\\git-core'
 
 var http = require('http');
+var moment = require('moment');
 var repos = require('pushover')(__dirname+'/tmp', { autoCreate: false });
+
 var config = require("./app.config");
+var api = require("./libs/api");
+var auth = require("./libs/auth");
 var conn = require("./libs/db");
 
-var permissableMethod = function(username, password, req, res) {
+var permissableMethod = function(creds, req, res) {
   repos.handle(req, res); 
-  // var user, _ref;
-  // // this.log(username, 'is trying to', method, 'on repo:', repo.name, '...');
-  // user = getUser(username, password, repo);
-  // if (user === false) {
-  //   res.statusCode = 500;
-  //   // this.log(username, 'was rejected as this user doesnt exist, or password is wrong');
-  //   return res.end('Wrong username or password');
-  // } else {
-  //   if (_ref = this.permMap[method], user.permissions.indexOf(_ref) >= 0) {
-  //     // this.log(username, 'Successfully did a', method, 'on', repo.name);
-  //     repos.handle(req, res); 
-  //   } else {
-  //   	res.statusCode = 500;
-  //     // this.log(username, 'was rejected, no permission to', method, 'on', repo.name);
-  //     return res.end("You dont have these permissions");
-  //   }
-  // }
 };
+var api = http.createServer(function(req, res){
 
-var server = http.createServer(function (req, res) { 
-  var auth, creds, plain_auth;
-  auth = req.headers['authorization'];
-  if (auth === void 0) {
+});
+
+var git = http.createServer(function (req, res) { 
+  var creds = auth.authorization(req.headers);
+  if (!creds) {
     res.statusCode = 401;
     res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
     return res.end();
   } else {
-    plain_auth = (new Buffer(auth.split(' ')[1], 'base64')).toString();
-    creds = plain_auth.split(':');
-    permissableMethod(creds[0], creds[1], req, res);
+    permissableMethod(creds, req, res);
+    // auth.permission(creds, req, res);
   }
 });
 
@@ -82,5 +70,11 @@ db.select('url').then(function(rows){
 //   console.log(found);
 
 // });
-console.log("Git SourceControl listen on "+config.git);
-server.listen(config.git);
+
+git.listen(config.git, function() {
+    console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
+});
+
+api.listen(config.api, function() {
+    console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
+});
