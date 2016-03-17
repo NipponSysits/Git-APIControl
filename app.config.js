@@ -1,7 +1,6 @@
 module.exports = {
 	dev: {
-		ip: '0.0.0.0',
-		port: 8100,
+		port: 811,
 		mysql: {
 			host: 'localhost',
 			user: 'root',
@@ -11,7 +10,6 @@ module.exports = {
 		}
 	},
 	serv: {
-		ip: '0.0.0.0',
 		port: 810,
 		mysql: {
 			host: 'localhost',
