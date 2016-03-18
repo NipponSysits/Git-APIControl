@@ -15,34 +15,63 @@ var api = http.createServer(function(req, res){
 });
 
 var git = http.createServer(function (req, res) { 
-  auth.authorization(req.headers).then(function(user){
-    if (!user) {
+  auth.access(req.headers).then(function(next){
+    if(next) {
+      repos.handle(req, res);
+    } else {
       res.statusCode = 401;
       res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
       res.end();
-    } else {
-      // console.log(creds);
-      // repos.handle(req, res);
-      // auth.permission(creds, req, res);
     }
   });
 });
 
 // EVENT
-repos.on('push', function (push) {
+repos.on('push', function(push) {
   console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
   push.accept();
 });
 
-repos.on('fetch', function (fetch) {
+repos.on('fetch', function(fetch) {
   console.log('fetch ' + fetch.repo + '/' + fetch.commit);
   fetch.accept();
 });
 
-repos.on('tag', function (tag) {
+
+repos.on('tag', function(tag) {
   console.log('tag ' + tag.repo + '/' + tag.commit);
   tag.accept();
 });
+
+
+repos.on('info', function(info) {
+  auth.username(info.headers).then(function(user){
+    // if(user.level > 0) {
+      auth.permission(info.repo, user).then(function(accept){
+        if(accept) {
+          console.log(user.username,'get /'+info.repo);
+          info.accept();
+        } else {
+          info.reject();
+        }
+      });
+    // } else {
+    //   console.log(user.username, "("+user.fullname+")",'get /'+info.repo);
+    //   info.accept();
+    // }
+  });
+});
+
+repos.on('head', function(head) {
+  console.log('head ' + head.repo);
+  head.accept();
+});
+repos.on('response', function(response, done) {
+  console.log('response',response);
+  done();
+});
+
+
 
 var db = conn.connect();
 db.select('url', {}).then(function(rows){
