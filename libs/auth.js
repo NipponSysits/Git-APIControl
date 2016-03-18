@@ -38,16 +38,16 @@ module.exports = {
 	},
 	permission: function(repo, user){
     var def = Q.defer();
-    // if(RegExp(user.username+"/").exec(repo)) {
-    // 	def.resolve(true);
-    // } else {
+    if(RegExp(user.username+"/").exec(repo)) {
+    	def.resolve(true);
+    } else {
 			db.selectOne('url', { url: repo }).then(function(row){
-				console.log(row.repository_id)
+				console.log()
 			}).catch(function(ex){
 			  def.resolve(false);
 			  console.log('permission', ex);
 			});
-    // }
+    }
     return def.promise;
 	}
 }
