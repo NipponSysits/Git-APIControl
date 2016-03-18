@@ -1,7 +1,7 @@
 module.exports = ({
 	dev: {
-		git: 810,
-		api: 811,
+		git: 8100,
+		api: 8200,
 		mysql: {
 			host: 'pgm.ns.co.th',
 			user: 'root',
