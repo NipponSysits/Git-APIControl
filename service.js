@@ -1,4 +1,5 @@
 var Service = require('node-windows').Service;
+var args = process.argv[2] || '-i';
 
 var svc = new Service({
   name:'PGM-Control',
@@ -29,10 +30,5 @@ svc.on('stop', function() {
   console.log('Service stoping');
 });
 
-// svc.user.domain = 'mydomain.local';
-// svc.user.account = 'username';
-// svc.user.password = 'password';
-// svc.sudo.password = 'password';
-
-svc.install();
-// svc.uninstall();
+if(args == '-i') svc.install();
+if(args == '-u') svc.uninstall();

@@ -1,32 +1,31 @@
 var http = require('http');
-var q = require('q');
+var Q = require('q');
 var moment = require('moment');
-var repos = require('pushover')(__dirname+'/tmp', { autoCreate: false });
-
 var config = require("./app.config");
-var api = require("./libs/api");
+
+var repos = require('pushover')(config.run=='dev'?__dirname+'/tmp':config.path, { autoCreate: false });
+
+var control = require("./libs/control");
 var auth = require("./libs/auth");
 var conn = require("./libs/db");
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
 
-var permissableMethod = function(creds, req, res) {
-  repos.handle(req, res); 
-};
 var api = http.createServer(function(req, res){
 
 });
 
 var git = http.createServer(function (req, res) { 
-  var creds = auth.authorization(req.headers);
-  if (!creds) {
-    res.statusCode = 401;
-    res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
-    return res.end();
-  } else {
-    permissableMethod(creds, req, res);
-    // auth.permission(creds, req, res);
-  }
+  auth.authorization(req.headers).then(function(creds){
+    if (!creds) {
+      res.statusCode = 401;
+      res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
+      res.end();
+    } else {
+      repos.handle(req, res);
+      // auth.permission(creds, req, res);
+    }
+  });
 });
 
 // EVENT
@@ -46,36 +45,21 @@ repos.on('tag', function (tag) {
 });
 
 var db = conn.connect();
-db.select('url', {}, function(err, rows, fields){
-  rows.forEach(function(row){
-    var git = /\/(.*)\/(.*)/.exec(row.url);
-    repos.exists(row.url, function(found){
-      if(!found) {
-        repos.create(row.url, function(err){
-          console.log(err, row.url);
-        })
-      }
-
-    });
-    // repos.create(repoName, function(){
-
-    // })
-
-    // repos.mkdir(dir, function(){
-      
-    // })
+db.select('url', {}).then(function(rows){
+  var items = [];
+  rows.forEach(function(row){ items.push(control.create(row.url)); });
+  return Q.all(items);
+}).then(function(){
+  // SERVER SOURCECONTROL //
+  git.listen(config.git, function() {
+    console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("HH:mm:ss"));
   });
-
-});
-// repos.exists('/dvgamers', function(found){
-//   console.log(found);
-
-// });
-
-git.listen(config.git, function() {
-  console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
+}).catch(function(ex){
+  db.end();
+  console.log('error:', ex);
 });
 
+// SERVER APISERVER //
 api.listen(config.api, function() {
-    console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("DD/MM/YYYY HH:mm:ss"));
+    console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("H:mm:ss"));
 });

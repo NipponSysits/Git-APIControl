@@ -1,5 +1,7 @@
 module.exports = ({
 	dev: {
+		run: 'dev',
+		domain: 'localhost',
 		git: 8100,
 		api: 8200,
 		mysql: {
@@ -9,10 +11,13 @@ module.exports = ({
 			password: '123456',
 			database: 'ns_develop'
 		},
+		path: 'C:/.SourceCode-Core/',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
 	},
 	serv: {
+		run: 'serv',
+		domain: 'dev.ns.co.th',
 		git: 810,
 		api: 820,
 		mysql: {
@@ -22,6 +27,7 @@ module.exports = ({
 			password: '123456',
 			database: 'ns_dev'
 		},
+		path: 'C:/.SourceCode-Core/',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
 	}
