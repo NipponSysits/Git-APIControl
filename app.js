@@ -2,8 +2,7 @@ var http = require('http');
 var Q = require('q');
 var moment = require('moment');
 var config = require("./app.config");
-
-var repos = require('pushover')(config.run=='dev'?__dirname+'/tmp':config.path, { autoCreate: false });
+var repos = require('pushover')(config.path, { autoCreate: false });
 
 var control = require("./libs/control");
 var auth = require("./libs/auth");
@@ -16,13 +15,14 @@ var api = http.createServer(function(req, res){
 });
 
 var git = http.createServer(function (req, res) { 
-  auth.authorization(req.headers).then(function(creds){
-    if (!creds) {
+  auth.authorization(req.headers).then(function(user){
+    if (!user) {
       res.statusCode = 401;
       res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
       res.end();
     } else {
-      repos.handle(req, res);
+      // console.log(creds);
+      // repos.handle(req, res);
       // auth.permission(creds, req, res);
     }
   });
@@ -53,6 +53,7 @@ db.select('url', {}).then(function(rows){
   // SERVER SOURCECONTROL //
   git.listen(config.git, function() {
     console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("HH:mm:ss"));
+    console.log('sample:', 'http://'+config.domain+':'+config.git+'/collection/product-test.git');
   });
 }).catch(function(ex){
   db.end();
