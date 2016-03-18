@@ -11,7 +11,7 @@ module.exports = ({
 			password: '123456',
 			database: 'ns_develop'
 		},
-		path: 'C:/.SourceCode-Core/',
+		path: './tmp',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
 	},
