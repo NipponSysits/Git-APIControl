@@ -38,16 +38,21 @@ module.exports = {
 	},
 	permission: function(repo, user){
     var def = Q.defer();
-    if(RegExp(user.username+"/").exec(repo)) {
-    	def.resolve(true);
-    } else {
-			db.selectOne('url', { url: repo }).then(function(row){
-				console.log()
-			}).catch(function(ex){
-			  def.resolve(false);
-			  console.log('permission', ex);
-			});
-    }
+
+		db.selectOne('permission', { url: repo }).then(function(permission){
+    	if(user.user_id != permission.user_id) {
+    		return db.select('repository_role', { repository_id: permission.repository_id, user_id: user.user_id }).then(function(roles){
+		  		def.resolve(roles.length > 0);
+    		});
+    	} else {
+		  	def.resolve(true);
+    	}
+		}).catch(function(ex){
+		  def.resolve(false);
+		  console.log('permission', ex);
+		});
     return def.promise;
 	}
 }
+
+// repository_role

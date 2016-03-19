@@ -46,8 +46,10 @@ repos.on('tag', function(tag) {
 
 repos.on('info', function(info) {
   auth.username(info.headers).then(function(user){
-    // if(user.level > 0) {
+    console.log('info check', user.level);
+    if(user.level > 0) {
       auth.permission(info.repo, user).then(function(accept){
+        console.log('accept', accept);
         if(accept) {
           console.log(user.username,'get /'+info.repo);
           info.accept();
@@ -55,10 +57,10 @@ repos.on('info', function(info) {
           info.reject();
         }
       });
-    // } else {
-    //   console.log(user.username, "("+user.fullname+")",'get /'+info.repo);
-    //   info.accept();
-    // }
+    } else {
+      console.log(user.username, "("+user.fullname+")",'get /'+info.repo);
+      info.accept();
+    }
   });
 });
 
@@ -74,7 +76,7 @@ repos.on('response', function(response, done) {
 
 
 var db = conn.connect();
-db.select('url', {}).then(function(rows){
+db.select('permission', {}).then(function(rows){
   var items = [];
   rows.forEach(function(row){ items.push(control.create(row.url)); });
   return Q.all(items);
