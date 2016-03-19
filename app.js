@@ -46,10 +46,10 @@ repos.on('tag', function(tag) {
 
 repos.on('info', function(info) {
   auth.username(info.headers).then(function(user){
-    console.log('info check', user.level);
+    // console.log('info check', user.level);
     if(user.level > 0) {
       auth.permission(info.repo, user).then(function(accept){
-        console.log('accept', accept);
+        // console.log('accept', accept);
         if(accept) {
           console.log(user.username,'get /'+info.repo);
           info.accept();
