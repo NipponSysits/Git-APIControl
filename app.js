@@ -29,7 +29,7 @@ var git = http.createServer(function (req, res) {
 // EVENT
 repos.on('push', function(push) {
   console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
-  push.accept();
+  push.accept(function(){ return 'callback test'; });
 });
 
 repos.on('fetch', function(fetch) {
