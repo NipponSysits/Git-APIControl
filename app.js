@@ -51,14 +51,14 @@ repos.on('info', function(info) {
       auth.permission(info.repo, user).then(function(accept){
         // console.log('accept', accept);
         if(accept) {
-          console.log(user.username,'get /'+info.repo);
+          console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
           info.accept();
         } else {
           info.reject();
         }
       });
     } else {
-      console.log(user.username, "("+user.fullname+")",'get /'+info.repo);
+      console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
       info.accept();
     }
   });
