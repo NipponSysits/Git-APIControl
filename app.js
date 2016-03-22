@@ -28,8 +28,10 @@ var git = http.createServer(function (req, res) {
 
 // EVENT
 repos.on('push', function(push) {
-  console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
-  push.accept(function(){ return 'callback test'; });
+  push.accept(function(){ 
+    
+    console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
+  });
 });
 
 repos.on('fetch', function(fetch) {
@@ -39,7 +41,9 @@ repos.on('fetch', function(fetch) {
 
 
 repos.on('tag', function(tag) {
-  console.log('tag ' + tag.repo + '/' + tag.commit);
+  if(typeof tag.commit != 'undefined') {
+    console.log('tag ' + tag.repo + '/' + tag.commit);
+  }
   tag.accept();
 });
 
