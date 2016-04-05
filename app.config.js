@@ -28,7 +28,7 @@ module.exports = ({
 			database: 'ns_develop'
 		},
 		path: '/data/source-code',
-		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
-		lfs: 'C:/Program Files/Git LFS'
+		core: '/usr/bin',
+		lfs: '/usr/bin'
 	}
 })[(/--(\w+)/.exec(process.argv[2] || '--serv') || ['', 'serv'])[1]]
