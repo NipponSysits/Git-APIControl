@@ -19,7 +19,7 @@ module.exports = ({
 		run: 'serv',
 		domain: 'dev.ns.co.th',
 		git: 810,
-		api: 820,
+		api: 811,
 		mysql: {
 			host: 'pgm.ns.co.th',
 			user: 'root',
