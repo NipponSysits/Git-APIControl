@@ -21,11 +21,11 @@ module.exports = ({
 		git: 810,
 		api: 820,
 		mysql: {
-			host: 'localhost',
+			host: 'pgm.ns.co.th',
 			user: 'root',
-			port: 3306,
+			port: 33061,
 			password: '123456',
-			database: 'ns_dev'
+			database: 'ns_develop'
 		},
 		path: '/data/source-code',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
