@@ -27,7 +27,7 @@ module.exports = ({
 			password: '123456',
 			database: 'ns_develop'
 		},
-		path: '/data/source-code',
+		path: '/data/debugger-source',
 		core: '/usr/bin',
 		lfs: '/usr/bin'
 	}
