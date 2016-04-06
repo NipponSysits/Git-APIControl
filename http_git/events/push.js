@@ -38,8 +38,7 @@ var onexit = function (ps, cb) {
 module.exports = function(push) {
   push.accept(function(){ 
     console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
-
-    var ps = spawn('pwd', [{ cwd : config.path + '/' + push.repo }]);
+    var ps = spawn('git', [ 'rev-list', '--all', '--count' ], { cwd : config.path + '/' + push.repo });
     
     var err = '', out = '';
     ps.stdout.on('data', function (buf) { 
@@ -49,6 +48,7 @@ module.exports = function(push) {
     ps.stderr.on('data', function (buf) { 
         err += buf;
     });
+    console.log(ps);
     onexit(ps, function (code) {
     	if(code != 0) {
     		console.log('----------------------------');
