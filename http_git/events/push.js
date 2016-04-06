@@ -38,7 +38,7 @@ module.exports = function(push) {
     console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
 
     var ps = spawn('git', [ 'rev-list', '--all', '--count', '/data/debugger-source/' + push.repo ]);
-    }
+    
     var err = '', out = '';
     ps.stdout.on('data', function (buf) { 
         out += buf;
