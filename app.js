@@ -1,101 +1,24 @@
-var http = require('http');
-var Q = require('q');
-var moment = require('moment');
-var config = require("./app.config");
-var repos = require('pushover')(config.path, { autoCreate: false });
+var http    = require('http');
+var express = require('express')();
+var morgan  = require('morgan');
+var moment  = require('moment');
 
-var control = require("./libs/control");
-var auth = require("./libs/auth");
-var conn = require("./libs/db");
+var config  = require("./app.config");
+
+var io      = require('socket.io').listen(api);
+var git     = require("./http_git/git-server");
+var api     = require("./http_api/api-server");
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
 
-var api = http.createServer(function(req, res){
-
+io.sockets.on('connection', function (socket) {
+  console.log('client', socket);
 });
 
-var git = http.createServer(function (req, res) { 
-  auth.access(req.headers).then(function(next){
-    if(next) {
-      repos.handle(req, res);
-    } else {
-      res.statusCode = 401;
-      res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
-      res.end();
-    }
-  });
-});
-
-// EVENT
-repos.on('push', function(push) {
-  push.accept(function(){ 
-    
-    console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
-  });
-});
-
-repos.on('fetch', function(fetch) {
-  console.log('fetch ' + fetch.repo + '/' + fetch.commit);
-  fetch.accept();
-});
-
-
-repos.on('tag', function(tag) {
-  if(typeof tag.commit != 'undefined') {
-    console.log('tag ' + tag.repo + '/' + tag.commit);
-  }
-  tag.accept();
-});
-
-
-repos.on('info', function(info) {
-  auth.username(info.headers).then(function(user){
-    // console.log('info check', user.level);
-    if(user.level > 0) {
-      auth.permission(info.repo, user).then(function(accept){
-        // console.log('accept', accept);
-        if(accept) {
-          console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
-          info.accept();
-        } else {
-          info.reject();
-        }
-      });
-    } else {
-      console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
-      info.accept();
-    }
-  });
-});
-
-repos.on('head', function(head) {
-  console.log('head ' + head.repo);
-  head.accept();
-});
-repos.on('response', function(response, done) {
-  console.log('response',response);
-  done();
-});
-
-
-
-var db = conn.connect();
-db.select('permission', {}).then(function(rows){
-  var items = [];
-  rows.forEach(function(row){ items.push(control.create(row.url)); });
-  return Q.all(items);
-}).then(function(){
-  // SERVER SOURCECONTROL //
-  git.listen(config.git, function() {
-    console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("HH:mm:ss"));
-    console.log('sample:', 'http://'+config.domain+':'+config.git+'/collection/product-test.git');
-  });
-}).catch(function(ex){
-  db.end();
-  console.log('error:', ex);
-});
+express.use(morgan('dev'));
+express.use('/control',[], api);
 
 // SERVER APISERVER //
-api.listen(config.api, function() {
+express.listen(config.api, function() {
     console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("H:mm:ss"));
 });
