@@ -16,7 +16,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 express.use(morgan('dev'));
-express.use('/control',[], api);
+express.use('/api',[], api);
 
 // SERVER APISERVER //
 express.listen(config.api, function() {
