@@ -4,6 +4,8 @@ var EmailTemplate = require('email-templates').EmailTemplate;
 var path = require('path');
 var changeset = new EmailTemplate(path.join(__dirname, '../../templates', 'changeset-email'));
 var spawn = require('child_process').spawn;
+var config 	= require("../../app.config");
+
 
 var transporter = nodemailer.createTransport({
   host: '192.168.10.2',
@@ -37,23 +39,24 @@ module.exports = function(push) {
   push.accept(function(){ 
     console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
 
-    var ps = spawn('git', [ 'rev-list', '--all', '--count', '/data/debugger-source/' + push.repo ]);
+    var ps = spawn('git', [ 'rev-list', '--all', '--count', config.path + '/' + push.repo ]);
     
     var err = '', out = '';
     ps.stdout.on('data', function (buf) { 
-        out += buf;
+    	console.log('data', buf);
+      out += buf;
     });
     ps.stderr.on('data', function (buf) { 
         err += buf;
     });
     onexit(ps, function (code) {
-    	console.log(code, out);
+    	if(code != 0) {
+    		console.log('----------------------------');
+    		console.log(err);
+    		console.log('----------------------------');
+    	}
+    	console.log('code', code, 'output', out.toString());
     });
-
-
-
-
-
 
 
 		var data = { 
@@ -94,9 +97,8 @@ module.exports = function(push) {
 		  transporter.sendMail(mailOptions, function(error, info){
 		    if(error) return console.log(error);
 		    var status = /\<(.*?)\>\s?\[InternalId=(\d+)\]\s?(.*)/g.exec(info.response);
-		    console.log('[ Message:', status[1], ']');
-		    console.log(status[2], ':', status[1]);
-		    console.log(status[1]);
+		    console.log('[ Message:', status[3], ']');
+		    console.log('Id', status[2], '-', status[1]);
 		  });
 
 		});
