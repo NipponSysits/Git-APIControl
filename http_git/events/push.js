@@ -1,77 +1,28 @@
-var nodemailer = require('nodemailer');
-var transporter = nodemailer.createTransport();
-var EmailTemplate = require('email-templates').EmailTemplate;
-var path = require('path');
-var changeset = new EmailTemplate(path.join(__dirname, '../../templates', 'changeset-email'));
-var spawn = require('child_process').spawn;
-var config 	= require("../../app.config");
-
-
-var transporter = nodemailer.createTransport({
-  host: '192.168.10.2',
-  port: 25,
-  auth: {
-    user: 'pgm',
-    pass: '123456'
-  },            
-  secure:false,
-  tls: { rejectUnauthorized: false },
-  debug:true
-});
-
-var onexit = function (ps, cb) {
-    var pending = 3;
-    var code, sig;
-    
-    function onend () {
-        if (--pending === 0) cb(code, sig);
-    }
-    ps.on('exit', function (c, s) {
-        code = c;
-        sig = s;
-    });
-    ps.on('exit', onend);
-    ps.stdout.on('end', onend);
-    ps.stderr.on('end', onend);
-};
+const control 	= require("../../libs/control");
+const config 		= require("../../app.config");
+const auth    	= require("../../libs/auth");
+const moment		= require("moment");
+const chalk 		= require('chalk');
+const path 			= require('path');
 
 module.exports = function(push) {
   push.accept(function(){ 
-    console.log('push ' + push.repo + '/' + push.commit + ' (' + push.branch + ')');
-    var ps = spawn('git', [ 'rev-list', '--all', '--count' ], { cwd : config.path + '/' + push.repo });
-    
-    var err = '', out = '';
-    ps.stdout.on('data', function (buf) { 
-    	console.log('data', buf);
-      out += buf;
-    });
-    ps.stderr.on('data', function (buf) { 
-        err += buf;
-    });
-    console.log(ps);
-    onexit(ps, function (code) {
-    	if(code != 0) {
-    		console.log('----------------------------');
-    		console.log(err);
-    		console.log('----------------------------');
-    	}
-    	console.log('code', code, 'output', out.toString());
-    });
 
-
+    var repopath = config.path + '/' + push.repo;
+    var revlist = [ 'rev-list', '--all', '--count' ];
+    var logs = [ '--no-pager','log','--all','--source','--stat','--date=iso','--name-status' ];
 		var data = { 
-		  avatar: 'c1ec9de8190fa568a2bd87b7713a7c57',
-		  password: '123456',
 		  commit_index: 22,
 		  repository: push.repo,
 		  parents: null,
 		  commit_id: push.commit,
 		  commit_branch: push.branch,
-		  commit_name: 'Kananek T. <kem@ns.co.th>',
-		  commit_date: 'March 30, 2016 11:18:21',
-		  comment_head: 'asdasdasd asd asd as das dasd asd sad asd as',
-		  comment_full: 'asdasdasd asd asd as \n \n sdasdasdasdasdasd',
-		  commit_btn: "Go to commit id '95be516'",
+		  commit_name: '',
+		  commit_date: '',
+		  comment_head: '',
+		  comment_full: '',
+		  commit_btn: "Go to commit id '" + push.commit.substr(0, 7) + "'",
+		  commit_link: "//pgm.ns.co.th/"+push.repo+'/info/'+push.commit,
 		  domain_name: 'pgm.ns.co.th',
 		  limit_rows: 50,
 		  files: [
@@ -82,25 +33,39 @@ module.exports = function(push) {
 		  ]
 		}
 
-		changeset.render(data, function (err, result) {
-		  if(err) return console.log('render', err);
+		auth.username(push.headers).then(function(user){
+			data.commit_name = user.fullname+'<'+user.email+'>';
+    	console.log(user.username, "("+user.fullname+")", 'push /' + push.repo, ':', push.branch);
+    	return control.cmd('git', revlist, repopath);
+    }).then(function(index){
+    	data.commit_index = index.replace(/[\n|\r]/g,'');
 
-		  var mailOptions = {
-		    from: 'pgm@ns.co.th', // sender address
-		    to: 'kem@ns.co.th', // list of receivers
-		    subject: "Kananek T. push 'test-template' project.", // Subject line
-		    text: result.text, // plaintext body
-		    html: result.html // html body
-		  };
-
-		  // send mail with defined transport object
-		  transporter.sendMail(mailOptions, function(error, info){
-		    if(error) return console.log(error);
-		    var status = /\<(.*?)\>\s?\[InternalId=(\d+)\]\s?(.*)/g.exec(info.response);
-		    console.log('[ Message:', status[3], ']');
-		    console.log('Id', status[2], '-', status[1]);
+      var since = "-n 1 ";
+			logs.push(since);
+    	return control.cmd('git', logs, repopath);
+    }).then(function(log){	
+      var sinceFormat = "yyyy-MM-dd HH:mm:ss zzz";
+    	var head = /Author:.(.*?>)\W+Date:.(.*)/.exec(log);
+    	var note = /\n\n([\S|\s]+)\n\n\w/.exec(log)[1];
+		  data.author_name = head[1],
+		  data.commit_date = moment(head[2], sinceFormat).format('MMMM DD, YYYY HH:mm:ss'),
+		  data.comment_head = note.trim().substr(0, 50);
+		  data.comment_full = note.trim();
+		  data.files = [];
+		  var fileRegex = /[D|A|M][\t|\s]+.*/g;
+		  log.match(fileRegex).forEach(function(file){
+		  	file = /([D|A|M])[\t|\s]+(.*)/g.exec(file);
+		  	var name = path.basename(file[2]);
+		  	data.files.push({
+		  		filename: name.substr(0, 30)+(name.length > 30 ? '...'+path.extname(file[2]) : ''), 
+		  		status: file[1], 
+		  		filepath: path.dirname('/'+file[2]) 
+		  	});
 		  });
+    	return control.changeset(data, push);
+    }).catch(function(ex){
+    	console.log(chalk.red('event--push', ex));
+    });
 
-		});
   });
 }

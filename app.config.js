@@ -11,6 +11,14 @@ module.exports = ({
 			password: '123456',
 			database: 'ns_develop'
 		},
+		smtp: {
+		  host: '192.168.10.2',
+		  port: 25,
+		  auth: { user: 'pgm', pass: '123456' },            
+		  secure: false,
+		  tls: { rejectUnauthorized: false },
+		  debug: true
+		},
 		path: './tmp',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
@@ -26,6 +34,14 @@ module.exports = ({
 			port: 33061,
 			password: '123456',
 			database: 'ns_develop'
+		},
+		smtp: {
+		  host: '192.168.10.2',
+		  port: 25,
+		  auth: { user: 'pgm', pass: '123456' },            
+		  secure: false,
+		  tls: { rejectUnauthorized: false },
+		  debug: true
 		},
 		path: '/data/debugger-source',
 		core: '/usr/bin',

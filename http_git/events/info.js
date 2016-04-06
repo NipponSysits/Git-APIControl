@@ -1,4 +1,6 @@
-var auth    = require("../../libs/auth");
+const auth    = require("../../libs/auth");
+const chalk   = require('chalk');
+
 
 module.exports = function(info) {
   auth.username(info.headers).then(function(user){
