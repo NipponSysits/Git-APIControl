@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width"/>
+</head>
+<body>
+<table class="body">
+<tr>
+<td class="center" align="center" valign="top">
+<center>
+<table class="row header">
+<tr>
+<td class="center" align="center" style="background-color:#171d2c;">
+<center>
+<table class="container">
+<tr>
+<td class="wrapper last">
+<table class="twelve columns" style="MARGIN-TOP:5px;width:100%;">
+<tr>
+<td class="four">
+<img src="http://pgm.ns.co.th/libs/img/pgm.changeset.png" width="200" height="39" >
+</td>
+<td class="eight" align="right" style="text-align:right; vertical-align:middle;">
+<div class="template-label">Changeset <%= commit_index %></div>
+<div class="template-sub-label"><%= comment_head %></div>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</center>
+</td>
+</tr>
+</table>
+
+<br>
+<table class="container">
+<tr>
+<td>
+<table class="row">
+<tr>
+<td class="wrapper last">
+<h3>Summary</h3>
+<table class="twelve columns">
+<tr>
+<td class="twelve col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Repository:</div>
+	<div style="margin-left:12px;"><%= repository %></div>
+</td>
+</tr>
+<tr>
+<td class="six col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Branch:</div>
+	<div style="margin-left:12px;"><%= commit_branch %></div>
+</td>
+<td class="six col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Commit:</div>
+	<div style="margin-left:12px;"><%= commit_id %></div>
+</td>
+</tr>
+<tr>
+<td class="six col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Author:</div>
+	<div style="margin-left:12px;"><a href="#"><%= commit_name %></a></div>
+</td>
+<td class="six col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Date:</div>
+	<div style="margin-left:12px;"><%= commit_date %></div>
+</td>
+</tr>
+<tr>
+<td colspan="2" class="twelve col-name">
+	<div style="font-size:11px;font-weight:bold;margin-left:5px;">Notes:</div>
+	<div style="margin-left:12px;"><%= comment_full %></div>
+</td>
+</tr>
+</table>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+<table class="row">
+<tr>
+<td class="wrapper last">
+<table class="twelve columns">
+<tr>
+<td>
+<h3>Items</h3>
+<table class="twelve columns">
+<tr>
+<td>
+<table class="twelve columns sub-grid">
+<tr>
+<td class="sub-head four" style="font-size:11px;font-weight:bold;background-color:#F3F3F3;padding:0px 3px 2px 3px">Name</td>
+<td class="sub-head eight" style="font-size:11px;font-weight:bold;background-color:#F3F3F3;padding:0px 3px 2px 3px">Folder</td>
+<td class="expander"></td>
+</tr>
+<% files.forEach(function(file){ %>
+	<tr>    
+	<td class="sub-columns four" style="font-size:11px;border-bottom: #ececec solid 1px!important;padding:0px 3px 2px 3px;
+	<% if(file.status == '+') { %>
+		color:#316ce5;
+	<% } else if(file.status == '-') { %>
+		color:#e01e1e;
+	<% } %>
+	">
+		<%= file.filename %>
+	</td>
+	<td class="sub-columns eight" style="font-size:11px;border-bottom: #ececec solid 1px!important;padding:0px 3px 2px 3px">
+		<%= file.filepath %>
+	</td>
+	<td class="expander"></td>
+	</tr>
+<% }); %>
+</table>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+
+<table class="row">
+<tr>
+<td class="wrapper last">
+<table class="twelve columns">
+<tr>
+<td>
+<table class="small-button">
+<tr>
+<td>
+<a href="{commit_link}"><%= commit_btn %></a>
+</td>
+</tr>
+</table>
+<hr>
+</td>
+<td class="expander"></td>
+</tr>
+<tr>
+<td style="color:#A3A3A3;font-size:9px;">
+ - You are receiving this notification because of a subscription created by Touno.K and provided by <%= domain_name %><br/>
+ - file change row limit is <%= limit_rows %> rows, please see other files in commit id.
+</td>
+<td class="expander"></td>
+</tr>
+<tr>
+<td align="center">
+<center>
+<p style="text-align:center;font-size:10px;">
+	E-mail design by <b>Mr.Kananek Thongkam</b> | <a href="github.com/dvgamer">Touno-K.com</a> &#169; 2014
+</p>
+</center>
+</td>
+<td class="expander"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</center>
+</td>
+</tr>
+</table>
+</body>
+</html>
