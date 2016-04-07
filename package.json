@@ -12,6 +12,7 @@
     "methods": "^1.1.2",
     "moment": "^2.11.1",
     "moment-precise-range": "^0.1.1",
+    "mongoose": "^4.4.11",
     "morgan": "^1.7.0",
     "mysql": "^2.10.2",
     "mysql-wrap": "^0.5.3",
