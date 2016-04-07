@@ -7,7 +7,12 @@ const path 			= require('path');
 
 module.exports = function(push) {
   push.accept(function(){ 
+  	if(push.commit == '0000000000000000000000000000000000000000') {
+  		// Delete Branch in Origin
 
+  	} else {
+  		
+  	}
     var repopath = config.path + '/' + push.repo;
     var revlist = [ 'rev-list', '--all', '--count' ];
     var logs = [ '--no-pager','log','--all','--source','--stat','--date=iso','--name-status' ];
