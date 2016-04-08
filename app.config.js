@@ -7,9 +7,9 @@ module.exports = ({
 		mysql: {
 			host: 'pgm.ns.co.th',
 			user: 'root',
-			port: 33061,
-			password: '123456',
-			database: 'ns_develop'
+			port: 3300,
+			password: 'pgm!1234',
+			database: 'js_debugger'
 		},
 		smtp: {
 		  host: '192.168.10.2',
@@ -19,6 +19,7 @@ module.exports = ({
 		  tls: { rejectUnauthorized: false },
 		  debug: true
 		},
+		mongoose: 'mongodb://dev.ns.co.th:20400/debugger',
 		path: './tmp',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
@@ -43,6 +44,7 @@ module.exports = ({
 		  tls: { rejectUnauthorized: false },
 		  debug: true
 		},
+		mongoose: 'mongodb://192.168.26.6:27017/debugger',
 		path: '/data/debugger-source',
 		core: '/usr/bin',
 		lfs: '/usr/bin'

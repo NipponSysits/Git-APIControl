@@ -4,23 +4,17 @@ const auth    	= require("../../libs/auth");
 const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
+const mongoose 	= require('mongoose');
+
+mongoose.connect(config.mongoose);
+
 
 module.exports = function(push) {
   push.accept(function(){
     var dirRepository = config.path+'/'+push.repo;
 
-  	if(push.commit == '0000000000000000000000000000000000000000') {
-  		// Delete Branch in Origin
 
-  	} else {
-
-  	}
-
-    var getTotalList = [ 'rev-list', '--all', '--count' ];
-    var getLogs = [ '--no-pager','log','--all','--source','--stat','--date=iso','--name-status' ];
-    var getComment = [ 'log','-n 1','--format=%B' ]
-    var getGraph = [ '--no-pager', 'log', '--graph', '--oneline', '--since=""' ];
-		var data = { 
+		var _ejs = { 
 		  commit_index: 22,
 		  repository: push.repo,
 		  commit_id: push.commit,
@@ -37,35 +31,58 @@ module.exports = function(push) {
 		}
 
 		auth.username(push.headers).then(function(user){
-			data.commit_name = user.fullname+'<'+user.email+'>';
+      var since_date = "-n 1";
+
+		  _ejs.files = [];
+      since_date = '--since="'+since_date+'"';
+
+	    var getTotalList = [ 'rev-list', '--all', '--count' ];
+	    var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--source','--stat','--date=iso','--author='+user.email,since_date ];
+
+	    var getHead = [ '--no-pager','show',push.commit,'--pretty=email','--date=iso','--name-status' ]; 
+	   	// git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 
+	    // From:(.*)\sDate:(.*)\sSubject: \[PATCH\](.*)\n\n\n
+	    // var getFiles = [ '--no-pager','show', push.commit,'--pretty=oneline','--all','--source','--stat','--date=iso','--name-status', since_date, '--author='+user.email ];
+	    var getFiles = [ '--no-pager','show',push.commit,'--pretty=oneline','--date=iso','--name-status' ];
+	    var getComment = [ 'log','-n 1','--format=%B', '--author='+user.email ]
+	    var getGraph = [ '--no-pager', 'log', '--graph', '--oneline', since_date, '--author='+user.email ];
+	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
+			_ejs.commit_name = user.fullname+'<'+user.email+'>';
+
     	console.log(user.username, "("+user.fullname+")", 'push /' + push.repo, ':', push.branch);
     	return control.cmd('git', getTotalList, dirRepository);
     }).then(function(index){
-    	data.commit_index = index.replace(/[\n|\r]/g,'');
+    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');
 
-      var since = "-n 1 ";
-			getLogs.push(since);
     	return control.cmd('git', getLogs, dirRepository);
     }).then(function(log){	
+
+
       var sinceFormat = "yyyy-MM-dd HH:mm:ss zzz";
     	var head = /Author:.(.*?>)\W+Date:.(.*)/.exec(log);
     	var note = /\n\n([\S|\s]+)\n\n\w/.exec(log)[1];
-		  data.author_name = head[1],
-		  data.commit_date = moment(head[2], sinceFormat).format('MMMM DD, YYYY HH:mm:ss'),
-		  data.comment_head = note.trim().substr(0, 50);
-		  data.comment_full = note.trim();
-		  data.files = [];
+		  _ejs.author_name = head[1],
+		  _ejs.commit_date = moment(head[2], sinceFormat).format('MMMM DD, YYYY HH:mm:ss'),
+		  _ejs.comment_head = note.trim().substr(0, 50);
+		  _ejs.comment_full = note.trim();
 		  var fileRegex = /[D|A|M][\t|\s]+.*/g;
 		  log.match(fileRegex).forEach(function(file){
 		  	file = /([D|A|M])[\t|\s]+(.*)/g.exec(file);
 		  	var name = path.basename(file[2]);
-		  	data.files.push({
+		  	_ejs.files.push({
 		  		filename: name.substr(0, 30)+(name.length > 30 ? '...'+path.extname(file[2]) : ''), 
 		  		status: file[1], 
 		  		filepath: path.dirname('/'+file[2]) 
 		  	});
 		  });
+
+  	if(push.commit === '0000000000000000000000000000000000000000') {
+  		// Delete Branch in Origin
+    	console.log(chalk.red('delete branch', push.branch, 'on remote.'));
+  	} else {
     	return control.changeset(data, push);
+  	}
+
     }).catch(function(ex){
     	console.log(chalk.red('event--push', ex));
     });
