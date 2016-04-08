@@ -45,28 +45,12 @@
 				</tr>
 				<tr>
 					<td>
-						<div class="text">Branch:</div>
-						<div class="value"><%= commit_branch %></div>
-					</td>
-					<td>
-						<div class="text">Commit:</div>
-						<div class="value"><%= commit_id %></div>
-					</td>
-				</tr>
-				<tr>
-					<td>
 						<div class="text">Author:</div>
 						<div class="value"><a href="#"><%= commit_name %></a></div>
 					</td>
 					<td>
 						<div class="text">Date:</div>
 						<div class="value"><%= commit_date %></div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<div class="text">Notes:</div>
-						<div class="value"><%= comment_full %></div>
 					</td>
 				</tr>
 				</table>
@@ -80,22 +64,12 @@
 		<table cellpadding="0" cellspacing="0" border="0" align="center">
 		<tr>
 			<td width="680">
-				<h2>Items</h2>
-				<table cellpadding="0" cellspacing="0" border="0" align="center" class="items">
-					<tr>
-						<td class="thead" colspan="2" width="210">Name</td>
-						<td class="thead" width="460">Folder</td>
-					</tr>
-					<% files.forEach(function(file){ %>
+				<h2>History</h2>
+				<table cellpadding="0" cellspacing="0" border="0" align="center" class="history">
+					<% graph.forEach(function(item){ %>
 					<tr>    
-						<td width="8" class="<%= file.class %>" style="text-align:center;font-weight:bold;">
-							<%= file.status %>
-						</td>
-						<td class="<%= file.class %>">
-							<div><%= file.filename %></div>
-						</td>
-						<td class="<%= file.class %>">
-							<div><%= file.filepath %></div>
+						<td width="680">
+							<%= item %>
 						</td>
 					</tr>
 					<% }); %>

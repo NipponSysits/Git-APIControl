@@ -231,6 +231,16 @@ table.items td.item-two {
 	padding:3px;
 }
 
+table.history {
+	
+}
+table.history td {
+	font-family: "Tahoma";
+	font-size:11px;
+	color: #333333;
+	border-bottom: #F3F3F3 solid 1px!important;
+	padding:2px;
+}
 /*div.add { font-weight: bold; }
 div.delete { text-decoration: line-through; }
 */
