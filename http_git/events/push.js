@@ -45,7 +45,7 @@ module.exports = function(push) {
 	    // var getFiles = [ '--no-pager','show', push.commit,'--pretty=oneline','--all','--source','--stat','--date=iso','--name-status', since_date, '--author='+user.email ];
 	    var getFiles = [ '--no-pager','show',push.commit,'--pretty=oneline','--date=iso','--name-status' ];
 	    var getComment = [ 'log','-n 1','--format=%B', '--author='+user.email ]
-	    var getGraph = [ '--no-pager', 'log', '--graph', '--oneline', since_date, '--author='+user.email ];
+	    var getGraph = [ '--no-pager', 'log', '--all', '--graph', '--oneline', since_date ];
 	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 			_ejs.commit_name = user.fullname+'<'+user.email+'>';
 
