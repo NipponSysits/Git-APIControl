@@ -31,9 +31,9 @@ module.exports = ({
 		mysql: {
 			host: 'pgm.ns.co.th',
 			user: 'root',
-			port: 33061,
-			password: '123456',
-			database: 'ns_develop'
+			port: 3300,
+			password: 'pgm!1234',
+			database: 'js_debugger'
 		},
 		smtp: {
 		  host: '192.168.10.2',
