@@ -1,13 +1,13 @@
-var http    = require('http');
-var express = require('express')();
-var morgan  = require('morgan');
-var moment  = require('moment');
+const http    = require('http');
+const express = require('express')();
+const morgan  = require('morgan');
+const moment  = require('moment');
 
-var config  = require("./app.config");
+const config  = require("./app.config");
 
-// var io      = require('socket.io').listen(api);
-var git     = require("./http_git/git-server");
-var api     = require("./http_api/api-server");
+// const io      = require('socket.io').listen(api);
+const git     = require("./http_git/git-server");
+const api     = require("./http_api/api-server");
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
 

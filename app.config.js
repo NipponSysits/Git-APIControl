@@ -1,7 +1,7 @@
 module.exports = ({
 	dev: {
 		run: 'dev',
-		domain: 'localhost',
+		domain: 'pgm.ns.co.th',
 		git: 8100,
 		api: 8200,
 		mysql: { host: 'pgm.ns.co.th', user: 'root', port: 3300, password: 'pgm!1234', database: 'js_debugger' },
@@ -10,7 +10,7 @@ module.exports = ({
 		  auth: { user: 'pgm', pass: '123456' },            
 		  secure: false, tls: { rejectUnauthorized: false }, debug: true
 		},
-		mongoose: 'mongodb://dev.ns.co.th:20400/debugger',
+		mongoose: 'mongodb://192.168.1.6:20400/debugger',
 		path: './tmp',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
@@ -26,7 +26,7 @@ module.exports = ({
 		  auth: { user: 'pgm', pass: '123456' },            
 		  secure: false, tls: { rejectUnauthorized: false }, debug: true
 		},
-		mongoose: 'mongodb://dev.ns.co.th:20400/debugger',
+		mongoose: 'mongodb://192.168.26.6:20400/debugger',
 		path: './tmp',
 		core: 'C:/Program Files/Git/mingw64/libexec/git-core',
 		lfs: 'C:/Program Files/Git LFS'
