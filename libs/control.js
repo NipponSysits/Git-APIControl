@@ -12,7 +12,6 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport(config.smtp);
 const path = require('path');
 const EmailTemplate = require('email-templates').EmailTemplate;
-const changeset = new EmailTemplate(path.join(__dirname, '../templates', 'changeset-email'));
 
 var onexit = function (ps, cb) {
   var pending = 3;
@@ -41,37 +40,65 @@ module.exports = {
     });
     return def.promise;
 	},
-	changeset: function(data, req){
+	email: function(template_name, options, data, req){
   	var def = Q.defer();
+		try {
+			var changeset = new EmailTemplate(path.join(__dirname, '../templates', template_name));
+		} catch(ex) {
+			console.log(ex);
+			def.reject({ error: ex.toString() });
+		}
+
 		changeset.render(data, function (err, result) {
 		  if(err) { def.reject({ error: err }); }
+		  options = options || {};
 
 		  var scopt = {}
-		  var mailOptions = { from: 'pgm@ns.co.th', to: [], cc: [], bcc: [], text: result.text, html: result.html };
+		  var mailOptions = { 
+		  	from: 'pgm@ns.co.th', 
+		  	to: options.to || [], 
+		  	cc: options.cc || [], 
+		  	bcc: options.bcc || [], 
+		  	text: result.text, 
+		  	html: result.html 
+		  };
+
 		  auth.username(req.headers).then(function(user){
 		  	scopt.user = user;
 		    return db.selectOne('permission', { url: req.repo });
-
 		  }).then(function(r){
 	  		scopt.notify = r.notify == 'YES' ? true : false;
 	  		scopt.repository_id = r.repository_id;
 
 		  	if(scopt.notify) {
 	  			var sql = "SELECT u.email FROM repository_role r JOIN user u ON r.user_id = u.user_id " 
-									+ "WHERE r.permission = 'Administrators' AND r.repository_id = :repository_id";
+									+ "WHERE (r.permission = 'Administrators' OR r.permission = 'Subscribe') AND r.repository_id = :repository_id";
 
 			  	return db.query(sql, { repository_id: r.repository_id }).then(function(u){
-			  		u.forEach(function(user){ mailOptions.cc.push(user.email); });
-			  		return db.query('SELECT email FROM user_access WHERE level < 2', {});
+			  		var mail_to = mailOptions.to.join('|');
+			  		u.forEach(function(user){ 
+			  			if(mail_to.indexOf(user.email) < 0 && mailOptions.cc.join('|').indexOf(user.email) < 0) {
+			  				mailOptions.cc.push(user.email);
+			  			}
+			  		});
+
+			  		return db.query("SELECT email FROM user_access WHERE level < 2", {});
 			  	}).then(function(u){
-	  				u.forEach(function(user){ mailOptions.bcc.push(user.email); });
+			  		var mail_to = mailOptions.to.join('|');
+			  		var mail_cc = mailOptions.cc.join('|');
+			  		u.forEach(function(user){ 
+			  			if((mail_to+'|'+mail_cc).indexOf(user.email) < 0 && mailOptions.bcc.join('|').indexOf(user.email) < 0) {
+			  				mailOptions.bcc.push(user.email);
+			  			}
+			  		});
 			  	}).catch(function(ex){
-				  	throw ex.toString();
+		  			def.reject({ error: ex.toString() });
 				  });
+				} else {
+		  		def.resolve();
 				}
 		  }).then(function(u){
 		  	if(scopt.notify) {
-			  	mailOptions.to = [ scopt.user.email ];
 			  	mailOptions.subject = scopt.user.fullname+" push '"+req.repo.replace(/\.git$/g, '')+"'"
 
 				  transporter.sendMail(mailOptions, function(err, info){
@@ -89,6 +116,7 @@ module.exports = {
 		  		def.resolve();
 		  	}
 		  }).catch(function(ex){
+		  	console.log(ex);
 		  	def.reject({ error: ex.toString() });
 		  });
 		});

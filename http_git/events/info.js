@@ -12,7 +12,8 @@ module.exports = function(info) {
           console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
           info.accept();
         } else {
-          info.reject();
+          console.log(chalk.red('reject--'+info.headers,'/'+info.repo));
+          info.reject('Please check username and password is not currect');
         }
       });
     } else {
