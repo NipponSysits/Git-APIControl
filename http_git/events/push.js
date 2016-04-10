@@ -2,6 +2,7 @@ const config  = require(".custom/config");
 const control = require(".custom/touno-git").control;
 const auth 		= require(".custom/touno-git").auth;
 const mongo 		= require(".custom/touno-db").mongo;
+const db 				= require(".custom/touno-db").mysql.connect();
 const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
@@ -40,7 +41,14 @@ module.exports = function(push) {
 	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 
     	console.log(user.username, "("+user.fullname+")", 'push /' + push.repo, ':', push.branch);
-    	return control.cmd('git', getTotalList, dirRepository).then(function(index){
+    	return db.query('SELECT repository_id FROM permission WHERE url = :url', {url:push.repo}).then(function(permission){
+    		if(permission.length > 1){
+    			permission[0].repository_id
+    		} else {
+
+    		}
+    		return control.cmd('git', getTotalList, dirRepository).then(function(index){
+	    }).then(function(logs){
 	    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');
 	    	return control.cmd('git', getHead, dirRepository);
 	    }).then(function(logs){
@@ -73,9 +81,17 @@ module.exports = function(push) {
 	    	}).filter(function(list){ if(list) { return list; } });
 
 
+
+	    	// 
+
 	      var since_date = "-n 1";
 	    	var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
-	    	return control.cmd('git', getLogs, dirRepository);
+	    	return mongo.commiter.getLast(user.user_id, ).then(function(commit){
+
+	    		return control.cmd('git', getLogs, dirRepository);
+	    	})
+
+	    	
 	    });
 
     }).then(function(logs){	
