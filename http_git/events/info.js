@@ -1,4 +1,4 @@
-const auth    = require("../../libs/auth");
+const auth    = require(".custom/touno-git").auth;
 const chalk   = require('chalk');
 
 

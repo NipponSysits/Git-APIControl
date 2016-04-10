@@ -1,13 +1,12 @@
+const config  = require(".custom/config");
+const http    = require('http');
+const Q 			= require('q');
+const moment 	= require('moment');
+const repos 	= require('pushover')(config.path, { autoCreate: false });
 
-var http    = require('http');
-var Q 			= require('q');
-var moment 	= require('moment');
-var config 	= require("../app.config");
-var repos 	= require('pushover')(config.path, { autoCreate: false });
-
-var control = require("../libs/control");
-var auth 		= require("../libs/auth");
-var conn 		= require("../libs/db");
+const control = require(".custom/touno-git").control;
+const auth 		= require(".custom/touno-git").auth;
+const db 		  = require(".custom/touno-db").mysql.connect();
 
 var git = http.createServer(function (req, res) { 
   auth.access(req.headers).then(function(next){
@@ -29,7 +28,6 @@ repos.on('info', require('././events/info'));
 repos.on('head', require('./events/head'));
 repos.on('response', require('./events/response'));
 
-var db = conn.connect();
 db.select('permission', {}).then(function(rows){
   var items = [];
   rows.forEach(function(row){ items.push(control.create(row.url)); });

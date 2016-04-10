@@ -1,10 +1,10 @@
-const control 	= require("../../libs/control");
-const config 		= require("../../app.config");
-const auth    	= require("../../libs/auth");
+const config  = require(".custom/config");
+const control = require(".custom/touno-git").control;
+const auth 		= require(".custom/touno-git").auth;
+const mongo 		= require(".custom/touno-db").mongo;
 const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
-const mongoose 	= require('mongoose');
 
 module.exports = function(push) {
   push.accept(function(){
@@ -71,53 +71,6 @@ module.exports = function(push) {
 		    		}
 	    		}
 	    	}).filter(function(list){ if(list) { return list; } });
-
-
-
-				mongoose.connect(config.mongoose);
-
-				var GitCommit = mongoose.model('git_commiter', new mongoose.Schema());
-				var query = GitCommit.findOne();
-
-				// // selecting the `name` and `occupation` fields
-				// query.select('name occupation');
-
-
-
-
-
-				// execute the query at a later time
-				query.exec(function (err, person) {
-				  if (err) return handleError(err);
-				  console.log('person', person) // Space Ghost is a talk show host.
-				})
-
-				var db = mongoose.connection;
-				db.on('error', console.error.bind(console, 'connection error:'));
-				db.once('open', function() {
-				  console.log("we're connected!", config.mongoose);
-				});
-
-var kittySchema = mongoose.Schema({
-    name: String
-});
-var Kitten = mongoose.model('Kitten', kittySchema);
-
-var silence = new Kitten({ name: 'Silence' });
-console.log(silence.name); // 'Silence'
-
-silence.save(function (err, silence) {
-  if (err) return console.error(err);
-	console.log(silence); // 'Silence'
-  
-});
-
-
-	    	console.log('start');
-				GitCommit.find().where('username', 'dvgamer').exec(function (err, commit) {
-				  console.log('commit', commit); // woof
-				});
-	    	console.log('stop');
 
 
 	      var since_date = "-n 1";
