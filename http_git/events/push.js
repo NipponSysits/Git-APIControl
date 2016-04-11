@@ -28,8 +28,6 @@ module.exports = function(push) {
 		  files: []
 		}
 
-
-
 		auth.username(push.headers).then(function(user){
 	    var getTotalList = [ 'rev-list', '--all', '--count' ];
 	    var getHead = [ '--no-pager','show',push.commit,'--pretty=email','--date=iso','--name-status' ]; 
@@ -41,15 +39,10 @@ module.exports = function(push) {
 	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 
     	console.log(user.username, "("+user.fullname+")", 'push /' + push.repo, ':', push.branch);
-    	return db.query('SELECT repository_id FROM permission WHERE url = :url', {url:push.repo}).then(function(permission){
-    		if(permission.length > 1){
-    			permission[0].repository_id
-    		} else {
-
-    		}
-    		return control.cmd('git', getTotalList, dirRepository).then(function(index){
-	    }).then(function(logs){
+			console.log(chalk.inverse('git', getTotalList));
+    	return control.cmd('git', getTotalList, dirRepository).then(function(index){
 	    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');
+  			console.log(chalk.inverse('git', getHead));
 	    	return control.cmd('git', getHead, dirRepository);
 	    }).then(function(logs){
 	    	var logHead = /From:.(.*?)\nDate:.(.*)\nSubject:.\[PATCH\].([\S|\s]*)?\n\n/g.exec(logs);
@@ -80,20 +73,20 @@ module.exports = function(push) {
 	    		}
 	    	}).filter(function(list){ if(list) { return list; } });
 
-
-
-	    	// 
-
-	      var since_date = "-n 1";
-	    	var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
-	    	return mongo.commiter.getLast(user.user_id, ).then(function(commit){
-
-	    		return control.cmd('git', getLogs, dirRepository);
-	    	})
-
-	    	
+	    	var commiter = {
+	    		user_id: user.user_id,
+	    		repository: push.repo
+	    	}
+	    	return mongo.commiter.select(commiter.user_id, commiter.repository).then(function(commit){
+	      	var since_date = "-n 1";
+	    		if(commit) since_date = '--since="'+commit.since+'"'
+	    		var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
+    			return mongo.commiter.update(commiter.user_id, commiter.repository, logHead[2]).then(function(){
+	    			console.log(chalk.inverse('git', getLogs));
+    				return control.cmd('git', getLogs, dirRepository);
+    			});
+	    	});
 	    });
-
     }).then(function(logs){	
     	logs = logs.match(/[0-9a-f]+..*/g);
     	console.log('logs', logs.length, '---', push.commit)
