@@ -10,7 +10,7 @@ const path 			= require('path');
 module.exports = function(push) {
   push.accept(function(){
     var dirRepository = config.path+'/'+push.repo;
-
+    var sinceFormat = 'ddd, D MMM YYYY HH:mm:ss ZZ';
     var _option = { to: [] }
 		var _ejs = { 
 		  commit_index: 22,
@@ -38,11 +38,11 @@ module.exports = function(push) {
 	    // var getComment = [ 'log','-n 1','--format=%B', '--author='+user.email ]
 	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 
-    	console.log(user.username, "("+user.fullname+")", 'push /' + push.repo, ':', push.branch);
-			console.log(chalk.inverse('git', getTotalList));
+    	console.log(user.username, "("+user.fullname+")", chalk.yellow('push /' + push.repo, ':', push.branch));
+			// console.log(chalk.yellow('git', getTotalList.join(' ')));
     	return control.cmd('git', getTotalList, dirRepository).then(function(index){
 	    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');
-  			console.log(chalk.inverse('git', getHead));
+  			// console.log(chalk.yellow('git', getHead.join(' ')));
 	    	return control.cmd('git', getHead, dirRepository);
 	    }).then(function(logs){
 	    	var logHead = /From:.(.*?)\nDate:.(.*)\nSubject:.\[PATCH\].([\S|\s]*)?\n\n/g.exec(logs);
@@ -52,13 +52,15 @@ module.exports = function(push) {
 	    	if(email[2] !== user.email) _option.to.push(email[2]);
 
 
-	    	var dateAt = moment(logHead[2], 'ddd, D MMM YYYY HH:mm:ss ZZ');
+	    	var dateAt = moment(logHead[2], sinceFormat);
 	    	console.log(dateAt.format('dddd, DD MMMM YYYY')); // Sat, 9 Apr 2016 14:33:47 +0700
 	    	console.log(dateAt.format('HH:mm:ss')); // Sat, 9 Apr 2016 14:33:47 +0700
 
-				var subject = ((/(.*)\n\n/g.exec(logHead[3]) || ['', logHead[3]])[1]).substr(0, 36)
 	    	var logChange = /\n\n([AMD]\s[\S\s]+)/g.exec(logs);
 
+	    	_ejs.comment_full = logHead[3];
+				_ejs.comment_subject = ((/(.*)\n\n/g.exec(logHead[3]) || ['', logHead[3]])[1]).substr(0, 36)
+	    	_ejs.commit_date = dateAt.format('dddd, DD MMMM YYYY HH:mm:ss');
 				_ejs.commit_name = email[0];
 	    	_ejs.files = (logChange[1] || []).split(/\n/).map(function(file){
 	    		file = /([AMD])\s+(.*)/g.exec(file);
@@ -79,24 +81,24 @@ module.exports = function(push) {
 	    	}
 	    	return mongo.commiter.select(commiter.user_id, commiter.repository).then(function(commit){
 	      	var since_date = "-n 1";
-	    		if(commit) since_date = '--since="'+commit.since+'"'
+	    		if(commit) {
+	    			var since = moment(commit.since, sinceFormat).add(1, 'seconds').format(sinceFormat);
+	    			since_date = '--since="'+since+'"';
+	    		}
 	    		var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
+    			// console.log(chalk.yellow('git', getLogs.join(' ')));
     			return mongo.commiter.update(commiter.user_id, commiter.repository, logHead[2]).then(function(){
-	    			console.log(chalk.inverse('git', getLogs));
     				return control.cmd('git', getLogs, dirRepository);
     			});
 	    	});
 	    });
-    }).then(function(logs){	
+    }).then(function(logs){
     	logs = logs.match(/[0-9a-f]+..*/g);
-    	console.log('logs', logs.length, '---', push.commit)
 	  	if(push.commit === '0000000000000000000000000000000000000000') {
 	    	console.log(chalk.red('delete branch', push.branch, 'on remote.'));
 	    } else if(logs.length > 1) {
 	    	console.log(chalk.red('changeset history'));
 	    // var getGraph = [ '--no-pager', 'log', '--all', '--graph', '--oneline', since_date ];
-
-
 	  	} else {
 	   		return control.email('changeset-email', _option, _ejs, push);
 	  	}

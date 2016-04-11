@@ -8,11 +8,10 @@ module.exports = function(info) {
     // if(user.level > 0) {
     auth.permission(info.repo, user).then(function(permission){
       if(permission.accept) {
-        console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
+        console.log(user.username, "("+user.fullname+")", chalk.yellow('info /'+info.repo));
         info.accept();
       } else {
-        console.log(chalk.red('reject--'+info.repo));
-        console.log(chalk.red('message--'+permission.error));
+        console.log(chalk.red('reject--'+info.repo+'--msg--'+permission.error));
         info.reject();//'Please check username and password is not currect'
       }
     });
