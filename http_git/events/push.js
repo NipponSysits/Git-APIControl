@@ -25,7 +25,8 @@ module.exports = function(push) {
 		  commit_link: "http://pgm.ns.co.th/"+push.repo+'/info/'+push.commit,
 		  domain_name: 'pgm.ns.co.th',
 		  limit_rows: 50,
-		  files: []
+		  files: [],
+		  logs: []
 		}
 
 		auth.username(push.headers).then(function(user){
@@ -85,7 +86,7 @@ module.exports = function(push) {
 	    			var since = moment(commit.since, sinceFormat).add(1, 'seconds').format(sinceFormat);
 	    			since_date = '--since="'+since+'"';
 	    		}
-	    		var getLogs = [ '--no-pager','log','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
+	    		var getLogs = [ '--no-pager','log','--graph','--abbrev-commit','--pretty=oneline','--all','--author='+email[0].trim(), since_date ];
     			// console.log(chalk.yellow('git', getLogs.join(' ')));
     			return mongo.commiter.update(commiter.user_id, commiter.repository, logHead[2]).then(function(){
     				return control.cmd('git', getLogs, dirRepository);
@@ -95,10 +96,21 @@ module.exports = function(push) {
     }).then(function(logs){
     	logs = logs.match(/[0-9a-f]+..*/g);
 	  	if(push.commit === '0000000000000000000000000000000000000000') {
-	    	console.log(chalk.red('delete branch', push.branch, 'on remote.'));
+	   		return control.email('changeset-branch', _option, _ejs, push);
 	    } else if(logs.length > 1) {
-	    	console.log(chalk.red('changeset history'));
-	    // var getGraph = [ '--no-pager', 'log', '--all', '--graph', '--oneline', since_date ];
+
+
+	    	var getGraph = [ '--no-pager','log','--graph','--all','--format="%H[--]%ae[--]%s[--]%ai"','-n 1' ];
+	    	return control.cmd('git', getGraph, dirRepository).then(function(){
+	    		_ejs.logs = logs;
+	    		_ejs.logs.forEach(function(log){
+	    			var graph = /([*\/\\| ]{2,100})/g.exec(log);
+	    			var commit = /([0-9a-f]{40})\[--\](.*)\[--\](.*)\[--\](.*)/g.exec(log);
+	    			console.log('graph', graph);
+	    			console.log('commit', commit);
+	    		})
+	   			return control.email('changeset-logs', _option, _ejs, push);
+	    	});
 	  	} else {
 	   		return control.email('changeset-email', _option, _ejs, push);
 	  	}
