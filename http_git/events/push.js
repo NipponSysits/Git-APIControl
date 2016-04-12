@@ -38,7 +38,7 @@ module.exports = function(push) {
 	    // var getComment = [ 'log','-n 1','--format=%B', '--author='+user.email ]
 	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 
-    	console.log(user.username, "("+user.fullname+")", chalk.yellow('push /' + push.repo, ':', push.branch));
+    	console.log(user.username, "("+user.fullname+")", chalk.green('push /' + push.repo, ':', push.branch));
 			// console.log(chalk.yellow('git', getTotalList.join(' ')));
     	return control.cmd('git', getTotalList, dirRepository).then(function(index){
 	    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');

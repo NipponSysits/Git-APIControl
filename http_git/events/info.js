@@ -6,7 +6,7 @@ module.exports = function(info) {
   auth.username(info.headers).then(function(user){
     // console.log('info check', user.level);
     // if(user.level > 0) {
-    auth.permission(info.repo, user).then(function(permission){
+    return auth.permission(info.repo, user).then(function(permission){
       if(permission.accept) {
         console.log(user.username, "("+user.fullname+")", chalk.yellow('info /'+info.repo));
         info.accept();

@@ -1,4 +1,10 @@
+const auth 		= require(".custom/touno-git").auth;
+
 module.exports = function(fetch) {
-  console.log('fetch ' + fetch.repo + '/' + fetch.commit);
-  fetch.accept();
+	auth.username(fetch.headers).then(function(user){
+	  console.log(user.username, "("+user.fullname+")", chalk.blue('fetch /'+info.repo));
+	  fetch.accept();
+	}).catch(function(){
+		fetch.reject();
+	});
 }
