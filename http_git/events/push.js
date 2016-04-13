@@ -107,7 +107,7 @@ module.exports = function(push) {
 	    		logs.split(/\n/g).forEach(function(log){
 	    			var graph = /([*\/\\| ]{2,100})/g.exec(log);
 	    			var commit = /([0-9a-f]{40})\[--\](.*)\[--\](.*)\[--\](.*)/g.exec(log);
-	    			var td_object = { icon: '', detail: '' };
+	    			var td_object = { icon: [], detail: '' };
 	    			if(commit) {
 	    				td_object.detail = commit[3];
 		    			console.log('graph', graph[1]);
@@ -124,7 +124,7 @@ module.exports = function(push) {
 		    					case '\\': icon = 'left'; break;
 		    					case '/': icon = 'right'; break;
 		    				}
-		    				td_object.icon += '<img src="http://pgm.ns.co.th/graph/' + icon + '.jpg" width="9" height="16" />';
+		    				td_object.icon.push('http://pgm.ns.co.th/graph/' + icon + '.jpg');
 		    				maxImg++;
 		    			}
 		    			_ejs.width_icon = _ejs.width_icon < maxImg*9 ? maxImg*9 : _ejs.width_icon;

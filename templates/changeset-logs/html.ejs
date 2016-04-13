@@ -69,7 +69,9 @@
 					<% graph.forEach(function(item){ %>
 					<tr>    
 						<td width="<%= width_icon %>">
-							<%= item.icon %>
+						<% item.icon.forEach(function(img){ %>
+							<img src="<%= img %>" width="9" height="16" />
+						<% }); %>
 						</td>
 						<td width="<%= width_detail %>">
 							<%= item.detail %>
