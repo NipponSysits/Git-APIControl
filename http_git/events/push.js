@@ -26,7 +26,9 @@ module.exports = function(push) {
 		  domain_name: 'pgm.ns.co.th',
 		  limit_rows: 50,
 		  files: [],
-		  logs: []
+		  width_icon: 0,
+		  width_detail: 680,
+		  graph: []
 		}
 
 		auth.username(push.headers).then(function(user){
@@ -99,16 +101,37 @@ module.exports = function(push) {
 	   		return control.email('changeset-branch', _option, _ejs, push);
 	    } else if(logs.length > 1) {
 
-
-	    	var getGraph = [ '--no-pager','log','--graph','--all','--format="%H[--]%ae[--]%s[--]%ai"','-n 1' ];
-	    	return control.cmd('git', getGraph, dirRepository).then(function(){
-	    		_ejs.logs = logs;
-	    		_ejs.logs.forEach(function(log){
+	    	var getGraph = [ '--no-pager','log','--graph','--all','--format=%H[--]%ae[--]%s[--]%ai','-n '+logs.length ];
+	    	return control.cmd('git', getGraph, dirRepository).then(function(logs){
+	    		var maxImg = 0;
+	    		logs.split(/\n/g).forEach(function(log){
 	    			var graph = /([*\/\\| ]{2,100})/g.exec(log);
 	    			var commit = /([0-9a-f]{40})\[--\](.*)\[--\](.*)\[--\](.*)/g.exec(log);
-	    			console.log('graph', graph);
-	    			console.log('commit', commit);
-	    		})
+	    			var td_object = { icon: '', detail: '' };
+	    			if(commit) {
+	    				td_object.detail = commit[3];
+		    			console.log('graph', graph[1]);
+		    			console.log('comit_id', commit[1]);
+		    			console.log('email', commit[2]);
+		    			console.log('comment', commit[3]);
+		    			console.log('date', commit[4]);
+		    			for (var i = 0; i < graph.length; i++) {
+		    				var icon = 'space';
+		    				switch(graph[i])
+		    				{
+		    					case '*': icon = 'point'; break;
+		    					case '|': icon = 'center'; break;
+		    					case '\\': icon = 'left'; break;
+		    					case '/': icon = 'right'; break;
+		    				}
+		    				td_object.icon += '<img src="http://pgm.ns.co.th/graph/' + icon + '.jpg" width="9" height="16" />';
+		    				maxImg++;
+		    			}
+		    			_ejs.width_icon = _ejs.width_icon < maxImg*9 ? maxImg*9 : _ejs.width_icon;
+	    			}
+	    			_ejs.graph.push(td_object)
+	    		});
+    			_ejs.width_detail = _ejs.width_detail - _ejs.width_icon;
 	   			return control.email('changeset-logs', _option, _ejs, push);
 	    	});
 	  	} else {

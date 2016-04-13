@@ -68,8 +68,11 @@
 				<table cellpadding="0" cellspacing="0" border="0" align="center" class="history">
 					<% graph.forEach(function(item){ %>
 					<tr>    
-						<td width="680">
-							<%= item %>
+						<td width="<%= width_icon %>">
+							<%= item.icon %>
+						</td>
+						<td width="<%= width_detail %>">
+							<%= item.detail %>
 						</td>
 					</tr>
 					<% }); %>
