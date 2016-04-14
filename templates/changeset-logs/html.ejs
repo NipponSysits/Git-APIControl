@@ -10,18 +10,18 @@
 	<tr>
 		<td style="background-color:#171d2c;padding:10px;">
 			<!-- HEADER MAIL -->
-			<div class="comment-subject"><%= comment_subject %></div>
+			<div class="comment-subject">HISTORY CHANGELOGS</div>
 			<table cellpadding="0" cellspacing="0" border="0" align="center">
 			<tr>
 				<td>
-					<table cellpadding="0" cellspacing="0" border="0">
+					<table cellpadding="0" cellspacing="0" border="0" id="changeset">
 					<tr>
 						<td width="200">
 							<img src="http://pgm.ns.co.th/libs/img/pgm.changeset.png" width="200" height="39" >
 						</td>
 						<td width="480" align="right" style="vertical-align:middle;">
 							<div class="changeset-index">Changeset <%= commit_index %></div>
-							<div class="changeset-subject"><%= comment_subject %></div>
+							<div class="changeset-subject">HISTORY CHANGELOGS</div>
 						</td>
 					</tr>
 					</table>
@@ -38,19 +38,21 @@
 				<h2>Summary</h2>
 				<table cellpadding="0" cellspacing="0" border="0" class="summary">
 				<tr>
-					<td width="680" colspan="2">
+					<td width="680">
 						<div class="text">Repository:</div>
 						<div class="value"><%= repository %></div>
 					</td>
 				</tr>
 				<tr>
 					<td>
+						<div class="text">Branch:</div>
+						<div class="value"><%= commit_branch %></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<div class="text">Author:</div>
 						<div class="value"><a href="#"><%= commit_name %></a></div>
-					</td>
-					<td>
-						<div class="text">Date:</div>
-						<div class="value"><%= commit_date %></div>
 					</td>
 				</tr>
 				</table>

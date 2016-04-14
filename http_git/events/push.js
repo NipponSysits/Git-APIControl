@@ -103,8 +103,8 @@ module.exports = function(push) {
 
 	    	var getGraph = [ '--no-pager','log','--graph','--all','--format=%H[--]%ae[--]%s[--]%ai','-n '+logs.length ];
 	    	return control.cmd('git', getGraph, dirRepository).then(function(logs){
-	    		var maxImg = 0;
-	    		logs.split(/\n/g).forEach(function(log){
+	    		var maxImg = 0, logHistory = logs.split(/\n/g);
+	    		logHistory.forEach(function(log){
 	    			var graph = /([*\/\\| ]{2,100})/g.exec(log);
 	    			var commit = /([0-9a-f]{40})\[--\](.*)\[--\](.*)\[--\](.*)/g.exec(log);
 	    			var td_object = { icon: [], detail: '' };
@@ -125,12 +125,13 @@ module.exports = function(push) {
 		    					case '/': icon = 'right'; break;
 		    				}
 		    				td_object.icon.push('http://pgm.ns.co.th/graph/' + icon + '.jpg');
-		    				maxImg++;
 		    			}
-		    			_ejs.width_icon = _ejs.width_icon < maxImg*9 ? maxImg*9 : _ejs.width_icon;
+		    			maxImg = graph.length > maxImg ? graph.length : maxImg;
+		    			_ejs.width_icon = maxImg*9;
 	    			}
 	    			_ejs.graph.push(td_object)
 	    		});
+	    		_ejs.commit_index = (parseInt(_ejs.commit_index) - logHistory.length) + ' - ' + _ejs.commit_index
     			_ejs.width_detail = _ejs.width_detail - _ejs.width_icon;
 	   			return control.email('changeset-logs', _option, _ejs, push);
 	    	});
