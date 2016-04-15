@@ -41,6 +41,6 @@ io.on('connection', function(socket){
 });
 
 // Schedule Task //
-var bundleSchedule = new cron.CronJob('30 6 6,18 * * 1-5', function() {  
+var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {  
 
 }, null, true);
