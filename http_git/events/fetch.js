@@ -7,5 +7,6 @@ module.exports = function(fetch) {
 	  fetch.accept();
 	}).catch(function(ex){
     console.log(chalk.red('event--fetch'), ex);
+    fetch.reject();
 	});
 }
