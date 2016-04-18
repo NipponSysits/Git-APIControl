@@ -69,7 +69,7 @@ module.exports = function(push) {
 	    	_ejs.files = (logChange[1] || []).split(/\n/).map(function(file){
 	    		file = /([AMD])\s+(.*)/g.exec(file);
 	    		if(file) {
-				  	var name = path.basename(file[2]);
+				  	var name = path.basename(file[2]) || '';
 				  	if(_ejs.limit_rows > logLimit) {
 				  		logLimit++;
 			    		return { 
