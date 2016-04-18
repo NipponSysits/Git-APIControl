@@ -5,7 +5,7 @@ module.exports = function(fetch) {
 	auth.username(fetch.headers).then(function(user){
 	  console.log(user.username, "("+user.fullname+")", chalk.cyan('fetch /'+fetch.repo));
 	  fetch.accept();
-	}).catch(function(){
-		fetch.reject();
+	}).catch(function(ex){
+    console.log(chalk.red('event--fetch'), ex);
 	});
 }
