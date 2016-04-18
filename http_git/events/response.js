@@ -1,4 +1,3 @@
-module.exports = function(response, done) {
-  console.log('response',response);
-  done();
+module.exports = function(stream) {
+  stream.end('EXTRA TEXT!\n');
 }

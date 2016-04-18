@@ -3,9 +3,9 @@ const chalk   = require('chalk');
 
 module.exports = function(fetch) {
 	auth.username(fetch.headers).then(function(user){
-	  console.log(user.username, "("+user.fullname+")", chalk.blue('fetch /'+fetch.repo));
+	  console.log(user.username, "("+user.fullname+")", chalk.cyan('fetch /'+fetch.repo));
 	  fetch.accept();
-	}).catch(function(ex){
+	}).catch(function(){
 		fetch.reject();
 	});
 }
