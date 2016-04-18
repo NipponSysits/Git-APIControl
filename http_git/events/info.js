@@ -4,8 +4,6 @@ const chalk   = require('chalk');
 
 module.exports = function(info) {
   auth.username(info.headers).then(function(user){
-    // console.log('info check', user.level);
-    // if(user.level > 0) {
     return auth.permission(info.repo, user).then(function(permission){
       if(permission.accept) {
         console.log(user.username, "("+user.fullname+")", chalk.yellow('info /'+info.repo));
@@ -15,9 +13,7 @@ module.exports = function(info) {
         info.reject();//'Please check username and password is not currect'
       }
     });
-    // } else {
-    //   console.log(user.username, "("+user.fullname+")",'info /'+info.repo);
-    //   info.accept();
-    // }
+  }).catch(function(ex){
+    console.log(chalk.red('event--info'), ex);
   });
 }

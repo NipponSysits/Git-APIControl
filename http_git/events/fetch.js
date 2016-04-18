@@ -6,6 +6,6 @@ module.exports = function(fetch) {
 	  console.log(user.username, "("+user.fullname+")", chalk.blue('fetch /'+fetch.repo));
 	  fetch.accept();
 	}).catch(function(ex){
-		fetch.reject();
+    console.log(chalk.red('event--fetch'), ex);
 	});
 }
