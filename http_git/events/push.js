@@ -59,7 +59,8 @@ module.exports = function(push) {
 	    	console.log(dateAt.format('dddd, DD MMMM YYYY')); // Sat, 9 Apr 2016 14:33:47 +0700
 	    	console.log(dateAt.format('HH:mm:ss')); // Sat, 9 Apr 2016 14:33:47 +0700
 
-	    	var logChange = /\n\n([AMD]\s[\S\s]+)/g.exec(logs);
+	    	var logLimit = 0;
+	    	var logChange = /\n\n([AMD]\s[\S\s]+)/g.exec(logs) || [];
 
 	    	_ejs.comment_full = logHead[3];
 				_ejs.comment_subject = ((/(.*)\n\n/g.exec(logHead[3]) || ['', logHead[3]])[1]).substr(0, 36)
@@ -69,12 +70,17 @@ module.exports = function(push) {
 	    		file = /([AMD])\s+(.*)/g.exec(file);
 	    		if(file) {
 				  	var name = path.basename(file[2]);
-		    		return { 
-		    			class: 'item-one',
-		    			filename: name.substr(0, 30)+(name.length > 30 ? '...'+path.extname(file[2]) : ''), 
-		    			status: file[1]=='A'?'+':file[1]=='D'?'-':'', 
-		    			filepath: path.dirname('/'+file[2])
-		    		}
+				  	if(_ejs.limit_rows > logLimit) {
+				  		logLimit++;
+			    		return { 
+			    			class: 'item-one',
+			    			filename: name.substr(0, 30)+(name.length > 30 ? '...'+path.extname(file[2]) : ''), 
+			    			status: file[1]=='A'?'+':file[1]=='D'?'-':'', 
+			    			filepath: path.dirname('/'+file[2])
+			    		}
+				  	} else {
+				  		return;
+				  	}
 	    		}
 	    	}).filter(function(list){ if(list) { return list; } });
 
