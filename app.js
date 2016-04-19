@@ -27,19 +27,23 @@ http.listen(config.api, function() {
 // LISTEN SOCKET API //
 const io = require( "socket.io" )(http);
 
+var client = 0;
 io.on('connection', function(socket){
-  console.log('user >> connected');
+  client++;
+  console.log('client-update', client);
 
-  socket.on('client checkin', function(data){
-  	console.log('checkin', data);
+  socket.on('checkin-stats', function(session){
+  	console.log('checkin', session);
+    socket.emit('checkin-stats', true);
   	// { created: Date.now(), username: 'guest-' }
   });
-  socket.on('client checkout', function(data){
-  	console.log('checkout', data);
-  	// { created: Date.now(), username: 'guest-' }
-  });
+  // socket.on('client checkout', function(session){
+  // 	console.log('checkout', data);
+  // 	// { created: Date.now(), username: 'guest-' }
+  // });
   socket.on('disconnect', function(){
-    console.log('user << disconnected');
+    client--;
+    console.log('client-update', client);
   });
 });
 
