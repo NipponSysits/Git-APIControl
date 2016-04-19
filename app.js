@@ -21,7 +21,7 @@ express.use('/api',[], api);
 express.get('/', function(req, res){ res.end(); });
 
 http.listen(config.api, function() {
-    console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("H:mm:ss"));
+    console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("HH:mm:ss"));
 });
 
 // LISTEN SOCKET API //
