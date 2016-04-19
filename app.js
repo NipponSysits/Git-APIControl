@@ -4,6 +4,7 @@ const http 		= require("http").createServer(express);
 const morgan  = require('morgan');
 const moment  = require('moment');
 const config  = require('.custom/config');
+const db      = require(".custom/touno-db").mysql.connect();
 const cron 		= require('cron');
 
 // const io      = require('socket.io').listen(api);
@@ -33,8 +34,16 @@ io.on('connection', function(socket){
   console.log('client-update', client);
 
   socket.on('checkin-stats', function(session){
-  	console.log('checkin', session);
-    socket.emit('checkin-stats', true);
+    var sql = 'select count(*) as access from user ' +
+              'where username=:username and md5(password)=:key';
+    db.query(sql, session).then(function(user){
+      var checkin = parseInt(user[0].access) > 0 ? true : false;
+      socket.emit('checkin-stats', checkin);
+    }).catch(function(ex){
+      console.log('err-checkin-stats', ex);
+      socket.emit('checkin-stats', false);
+    });
+    
   	// { created: Date.now(), username: 'guest-' }
   });
   // socket.on('client checkout', function(session){
