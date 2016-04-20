@@ -66,7 +66,7 @@ module.exports = function(push) {
 				_ejs.comment_subject = ((/(.*)\n\n/g.exec(logHead[3]) || ['', logHead[3]])[1]).substr(0, 36)
 	    	_ejs.commit_date = dateAt.format('dddd, DD MMMM YYYY HH:mm:ss');
 				_ejs.commit_name = email[0];
-	    	_ejs.files = (logChange[1] || []).split(/\n/).map(function(file){
+	    	_ejs.files = (logChange[1] || '').split(/\n/).map(function(file){
 	    		file = /([AMD])\s+(.*)/g.exec(file);
 	    		if(file) {
 				  	var name = path.basename(file[2]) || '';
