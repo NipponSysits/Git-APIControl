@@ -33,7 +33,9 @@ module.exports = function(push) {
 
 		auth.username(push.headers).then(function(user){
 	    var getTotalList = [ 'rev-list', '--all', '--count' ];
-	    var getHead = [ '--no-pager','show',push.commit,'--pretty=email','--date=iso','--name-status' ]; 
+	    var getHead = [ '--no-pager','show', push.commit,'--pretty=email','--date=iso','--name-status' ]; 
+
+	    getHead = getHead.map(function(arg){ return arg === '0000000000000000000000000000000000000000' ? '-n 1' : arg; });
 	   	// git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 
 	    // From:(.*)\sDate:(.*)\sSubject: \[PATCH\](.*)\n\n\n
 	    // var getFiles = [ '--no-pager','show', push.commit,'--pretty=oneline','--all','--source','--stat','--date=iso','--name-status', since_date, '--author='+user.email ];
@@ -53,7 +55,6 @@ module.exports = function(push) {
 
 	    	_option.to.push(user.email);
 	    	if(email[2] !== user.email) _option.to.push(email[2]);
-
 
 	    	var dateAt = moment(logHead[2], sinceFormat);
 	    	console.log(dateAt.format('dddd, DD MMMM YYYY')); // Sat, 9 Apr 2016 14:33:47 +0700
@@ -103,7 +104,8 @@ module.exports = function(push) {
 	    });
     }).then(function(logs){
     	logs = logs.match(/[0-9a-f]+..*/g);
-	  	if(push.commit === '0000000000000000000000000000000000000000\n') {
+
+	  	if(push.commit === '0000000000000000000000000000000000000000') {
 	   		return control.email('changeset-branch', _option, _ejs, push);
 	    } else if(logs.length > 1) {
 
