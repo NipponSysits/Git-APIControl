@@ -103,7 +103,7 @@ module.exports = function(push) {
 	    });
     }).then(function(logs){
     	logs = logs.match(/[0-9a-f]+..*/g);
-	  	if(push.commit === '0000000000000000000000000000000000000000') {
+	  	if(push.commit === '0000000000000000000000000000000000000000\n') {
 	   		return control.email('changeset-branch', _option, _ejs, push);
 	    } else if(logs.length > 1) {
 
