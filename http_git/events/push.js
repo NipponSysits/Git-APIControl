@@ -133,7 +133,7 @@ module.exports = function(push) {
 		    					case '\\': icon = 'left'; break;
 		    					case '/': icon = 'right'; break;
 		    				}
-		    				td_object.icon.push('http://pgm.ns.co.th/graph/' + icon + '.jpg');
+		    				td_object.icon.push('http://static.touno-k.com/graph/' + icon + '.jpg');
 		    			}
 		    			maxImg = graph.length > maxImg ? graph.length : maxImg;
 		    			_ejs.width_icon = maxImg*9;
