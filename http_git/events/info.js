@@ -1,5 +1,5 @@
 const auth    = require(".custom/touno-git").auth;
-const moment    = require("moment");
+const moment  = require("moment");
 const chalk   = require('chalk');
 
 
@@ -11,12 +11,11 @@ module.exports = function(info) {
         console.log(chalk.yellow(infoTime), user.username, "info", info.repo);
         info.accept();
       } else {
-        console.log(chalk.red(infoTime), user.username, chalk.red('reject'), info.repo);
-        console.log(chalk.red('msg --'), permission.error);
+        console.log(chalk.red(infoTime), user.username, chalk.red('reject'), info.repo, permission.error);
         info.reject();//'Please check username and password is not currect'
       }
     });
   }).catch(function(ex){
-    console.log(chalk.red('event--info'), ex);
+    console.log(chalk.red(infoTime), chalk.red('catch--info'), ex);
   });
 }

@@ -1,6 +1,10 @@
+const moment    = require("moment");
+const chalk   	= require('chalk');
+
 module.exports = function(tag) {
+  var infoTime = moment().format('HH:mm:ss, dddd');
   if(typeof tag.commit != 'undefined') {
-    console.log('tag ' + tag.repo + '/' + tag.commit);
+	  console.log(chalk.yellow(infoTime), 'tag ' + head.repo);
   }
   tag.accept();
 }
