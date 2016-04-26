@@ -2,7 +2,7 @@ const config  = require(".custom/config");
 const http    = require('http');
 const Q 			= require('q');
 const moment 	= require('moment');
-const repos 	= require('pushover')(config.path, { autoCreate: false });
+const repos 	= require('pushover')(config.source, { autoCreate: false });
 
 const control = require(".custom/touno-git").control;
 const auth 		= require(".custom/touno-git").auth;
@@ -30,9 +30,9 @@ module.exports = {
     repos.on('head', require('./events/head'));
     repos.on('response', require('./events/response'));
 
-    db.select('permission', {}).then(function(rows){
+    db.select('repositories', {}).then(function(rows){
       var items = [];
-      rows.forEach(function(row){ items.push(control.create(row.url)); });
+      rows.forEach(function(row){ items.push(control.create(row.config, row.dir_name)); });
       return Q.all(items);
     }).then(function(){
       // SERVER SOURCECONTROL //

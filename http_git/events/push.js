@@ -10,7 +10,7 @@ const path 			= require('path');
 module.exports = function(push) {
   push.accept(function(){
   	var infoTime = moment().format('HH:mm:ss, dddd');
-    var dirRepository = config.path+'/'+push.repo;
+    var dirRepository = config.source+'/'+push.repo;
     var sinceFormat = 'ddd, D MMM YYYY HH:mm:ss ZZ';
     var _option = { to: [] }
 		var _ejs = { 
