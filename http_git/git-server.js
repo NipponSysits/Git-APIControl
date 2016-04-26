@@ -32,7 +32,7 @@ module.exports = {
 
     db.select('repositories', {}).then(function(rows){
       var items = [];
-      rows.forEach(function(row){ items.push(control.create(row.config, row.dir_name)); });
+      rows.forEach(function(row){ items.push(control.create(row)); });
       return Q.all(items);
     }).then(function(){
       // SERVER SOURCECONTROL //
