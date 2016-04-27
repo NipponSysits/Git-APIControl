@@ -3,7 +3,7 @@ const moment  = require("moment");
 const chalk   = require('chalk');
 
 module.exports = function(fetch) {
-  var infoTime = moment().format('HH:mm:ss, dddd');
+  var infoTime = moment().format(' HH:mm:ss dddd');
 	auth.username(fetch.headers).then(function(user){
 	  console.log(chalk.yellow(infoTime), user.username, "("+user.fullname+")", chalk.cyan('fetch /'+fetch.repo));
 	  fetch.accept();

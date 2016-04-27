@@ -6,7 +6,7 @@ const chalk   = require('chalk');
 module.exports = function(info) {
   auth.username(info.headers).then(function(user){
     return auth.permission(info.repo, user).then(function(permission){
-      var infoTime = moment().format('HH:mm:ss, dddd');
+      var infoTime = moment().format(' HH:mm:ss dddd');
       if(permission.accept) {
         console.log(chalk.yellow(infoTime), user.username, "info", info.repo);
         info.accept();
