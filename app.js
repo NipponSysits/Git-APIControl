@@ -12,8 +12,8 @@ const git     = require("./http_git/git-server");
 const api     = require("./http_api/api-server");
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
-if(!/^5\./.exec(process.versions.node)) {
-  console.log('\nNode version is not 5.x.x');
+if(!/^6\./.exec(process.versions.node)) {
+  console.log('\nNode version is not 6.x.x');
   process.exit()
 }
 
