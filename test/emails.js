@@ -17,8 +17,24 @@ let options = {
 
 }
 
-let data = {
-
+let data = { 
+  commit_index: 22,
+  repository: '/dvgamer/test.git',
+  commit_id: '00000000000000000000000000000000',
+  commit_branch: 'master',
+  commit_name: '',
+  commit_date: '',
+  comment_subject: '',
+  comment_full: '',
+  commit_btn: "Go to commit id '0000000'",
+  commit_link: "http://pgm.ns.co.th/Source/dvgamer/test.git/info/00000000000000000000000000000000",
+  domain_name: 'pgm.ns.co.th',
+  limit_rows: 50,
+  static: '//'+config.domain+':'+config.api+'/',
+  files: [],
+  width_icon: 0,
+  width_detail: 680,
+  graph: []
 }
 
 let req = {

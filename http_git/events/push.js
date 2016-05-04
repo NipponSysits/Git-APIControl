@@ -26,6 +26,7 @@ module.exports = function(push) {
 		  commit_link: "http://pgm.ns.co.th/"+push.repo+'/info/'+push.commit,
 		  domain_name: 'pgm.ns.co.th',
 		  limit_rows: 50,
+		  static: '//'+config.domain+':'+config.api+'/',
 		  files: [],
 		  width_icon: 0,
 		  width_detail: 680,
