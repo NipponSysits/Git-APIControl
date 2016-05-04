@@ -35,7 +35,7 @@ module.exports = function(push) {
 
 		auth.username(push.headers).then(function(user){
 	    var getTotalList = [ 'rev-list', '--all', '--count' ];
-	    var getHead = [ '--no-pager','show', push.commit,'--pretty=email','--date=iso','--name-status' ]; 
+	    var getHead = [ '--no-pager','show', push.commit,'--pretty=medium','--date=iso','--name-status' ]; 
 
 	    getHead = getHead.map(function(arg){ return arg === '0000000000000000000000000000000000000000' ? '-n 1' : arg; });
 	   	// git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 
@@ -52,6 +52,8 @@ module.exports = function(push) {
   			// console.log(chalk.yellow('git', getHead.join(' ')));
 	    	return control.cmd('git', getHead, dirRepository);
 	    }).then(function(logs){
+
+	    	// CHANGE PEATURN HEAD
 	    	var logHead = /From:.(.*?)\nDate:.(.*)\nSubject:.\[PATCH\].([\S|\s]*)?\n\n/g.exec(logs);
 	    	var email = /(.*)\<(.*)\>/g.exec(logHead[1]);
 
@@ -64,9 +66,10 @@ module.exports = function(push) {
 
 	    	var logLimit = 0;
 	    	var logChange = /\n\n([AMD]\s[\S\s]+)/g.exec(logs) || [];
-
-	    	_ejs.comment_full = logHead[3];
-				_ejs.comment_subject = ((/(.*)\n\n/g.exec(logHead[3]) || ['', logHead[3]])[1]).substr(0, 36)
+	    	var comment_text = logHead[3];
+	    	console.log('comment', comment_text);
+	    	_ejs.comment_full = comment_text;
+				_ejs.comment_subject = ((/(.*)\n\n/g.exec(comment_text) || ['', comment_text])[1]).substr(0, 36)
 	    	_ejs.commit_date = dateAt.format('dddd, DD MMMM YYYY HH:mm:ss');
 				_ejs.commit_name = email[0];
 	    	_ejs.files = (logChange[1] || '').split(/\n/).map(function(file){
