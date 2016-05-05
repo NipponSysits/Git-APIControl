@@ -30,10 +30,12 @@ let data = {
   commit_link: "http://pgm.ns.co.th/Source/dvgamer/test.git/info/00000000000000000000000000000000",
   domain_name: 'pgm.ns.co.th',
   limit_rows: 50,
+  avatar: '',
   static: 'http://'+config.domain+':'+config.api+'/',
   files: [],
   width_icon: 0,
   width_detail: 680,
+  password: '123456',
   graph: []
 }
 
