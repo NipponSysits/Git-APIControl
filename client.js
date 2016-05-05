@@ -1,5 +1,5 @@
-const config = require('.custom/config');
-const socket = require('.custom/socket').clent;
+const config = require('$custom/config');
+const socket = require('$custom/socket').clent;
 
 socket.on('connect', function(){
 	console.log('client connecting.');

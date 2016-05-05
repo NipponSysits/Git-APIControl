@@ -5,8 +5,8 @@ chai.use(chaiAsPromised);
 var expect = chai.expect; // we are using the "expect" style of Chai
 // var CartSummary = require('./../../src/part1/cart-summary');
 const Q   = require("Q");
-const config  = require(".custom/config");
-const git     = require(".custom/touno-git").control;
+const config  = require("$custom/config");
+const git     = require("$custom/touno-git").control;
 
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport(config.smtp);

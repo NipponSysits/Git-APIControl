@@ -1,12 +1,12 @@
-const config  = require(".custom/config");
+const config  = require("$custom/config");
 const http    = require('http');
 const Q 			= require('q');
 const moment 	= require('moment');
 const repos 	= require('pushover')(config.source, { autoCreate: false });
 
-const control = require(".custom/touno-git").control;
-const auth 		= require(".custom/touno-git").auth;
-const db 		  = require(".custom/touno-db").mysql.connect();
+const control = require("$custom/touno-git").control;
+const auth 		= require("$custom/touno-git").auth;
+const db 		  = require("$custom/touno-db").mysql.connect();
 
 module.exports = { 
   listen: function(){
