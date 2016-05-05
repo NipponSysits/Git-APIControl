@@ -28,8 +28,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "mocha test --local --recursive --watch",
-    "dev": "node app.js --local"
+    "test": "mocha test --recursive --watch",
+    "dev": "node app.js"
   },
   "author": "Touno.K",
   "license": "ISC",
