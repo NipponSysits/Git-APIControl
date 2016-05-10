@@ -111,6 +111,7 @@ module.exports = function(push) {
     	logs = logs.match(/[0-9a-f]+..*/g);
 
 	  	if(push.commit === '0000000000000000000000000000000000000000') {
+	  		_option.subject = 'branch delete';
 	   		return control.email('changeset-branch', _option, _ejs, push);
 	    } else if(logs.length > 1) {
 
@@ -128,24 +129,25 @@ module.exports = function(push) {
 		    			console.log('email', commit[2]);
 		    			console.log('comment', commit[3]);
 		    			console.log('date', commit[4]);
-		    			for (var i = 0; i < graph.length; i++) {
+		    			for (var i = 0; i < graph[1].length; i++) {
 		    				var icon = 'space';
-		    				switch(graph[i])
+		    				switch(graph[1][i])
 		    				{
 		    					case '*': icon = 'point'; break;
 		    					case '|': icon = 'center'; break;
 		    					case '\\': icon = 'left'; break;
 		    					case '/': icon = 'right'; break;
 		    				}
-		    				td_object.icon.push('http://static.touno-k.com/graph/' + icon + '.jpg');
+		    				td_object.icon.push('http://dev.ns.co.th:810/graph/' + icon + '.jpg');
 		    			}
-		    			maxImg = graph.length > maxImg ? graph.length : maxImg;
+		    			maxImg = graph[1].length > maxImg ? graph[1].length : maxImg;
 		    			_ejs.width_icon = maxImg*9;
 	    			}
 	    			_ejs.graph.push(td_object)
 	    		});
 	    		_ejs.commit_index = (parseInt(_ejs.commit_index) - logHistory.length) + ' - ' + _ejs.commit_index
     			_ejs.width_detail = _ejs.width_detail - _ejs.width_icon;
+	  			_option.subject = 'history logs';
 	   			return control.email('changeset-logs', _option, _ejs, push);
 	    	});
 	  	} else {
