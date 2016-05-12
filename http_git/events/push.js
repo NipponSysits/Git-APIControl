@@ -39,7 +39,7 @@ module.exports = function(push) {
 
 	    getHead = getHead.map(function(arg){ return arg === '0000000000000000000000000000000000000000' ? '-n 1' : arg; });
 
-  		var repo = info.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
+  		var repo = push.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
     	console.log(chalk.green(infoTime), "logs", user.fullname, "push",chalk.green(repo, ':', push.branch));
 			// console.log(chalk.yellow('git', getTotalList.join(' ')));
     	return control.cmd('git', getTotalList, dirRepository).then(function(index){
