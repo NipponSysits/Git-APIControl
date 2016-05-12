@@ -9,7 +9,7 @@ const path 			= require('path');
 
 module.exports = function(push) {
   push.accept(function(){
-  	var infoTime = moment().format(' HH:mm:ss dddd');
+  	var infoTime = moment().format(' HH:mm:ss');
     var dirRepository = config.source+'/'+push.repo;
     var sinceFormat = 'ddd, D MMM YYYY HH:mm:ss ZZ';
     var _option = { to: [] }
@@ -38,14 +38,9 @@ module.exports = function(push) {
 	    var getHead = [ '--no-pager','show', push.commit,'--pretty=medium','--date=iso','--name-status' ]; 
 
 	    getHead = getHead.map(function(arg){ return arg === '0000000000000000000000000000000000000000' ? '-n 1' : arg; });
-	   	// git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 
-	    // From:(.*)\sDate:(.*)\sSubject: \[PATCH\](.*)\n\n\n
-	    // var getFiles = [ '--no-pager','show', push.commit,'--pretty=oneline','--all','--source','--stat','--date=iso','--name-status', since_date, '--author='+user.email ];
-	    // var getFiles = [ '--no-pager','show',push.commit,'--pretty=oneline','--date=iso','--name-status' ];
-	    // var getComment = [ 'log','-n 1','--format=%B', '--author='+user.email ]
-	    // git --no-pager show 2399b4838c98ed943d85124de58f8eee4ed2a493 --pretty=email --all --source --stat --date=iso --name-status -n 4
 
-    	console.log(chalk.green(infoTime), user.username, "("+user.fullname+")", chalk.green('push /' + push.repo, ':', push.branch));
+  		let repo = info.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
+    	console.log(chalk.green(infoTime), "logs", user.fullname, "push",chalk.green(repo, ':', push.branch));
 			// console.log(chalk.yellow('git', getTotalList.join(' ')));
     	return control.cmd('git', getTotalList, dirRepository).then(function(index){
 	    	_ejs.commit_index = index.replace(/[\n|\r]/g,'');
