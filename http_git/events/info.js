@@ -5,7 +5,7 @@ const chalk   = require('chalk');
 
 
 module.exports = function(info) {
-  let repo = info.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
+  var repo = info.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
   auth.username(info.headers).then(function(user){
     return auth.permission(info.repo, user).then(function(permission){
       var infoTime = moment().format(' HH:mm:ss');
