@@ -1,3 +1,5 @@
+"use strict";
+
 const config = require('$custom/config');
 const socket = require('$custom/socket').clent;
 

@@ -1,3 +1,4 @@
+"use strict";
 const config  = require("$custom/config");
 const http    = require('http');
 const Q 			= require('q');

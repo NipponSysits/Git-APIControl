@@ -1,3 +1,4 @@
+"use strict";
 var http = require('http'), express = require('express'), app = express();
 var port = 8210;
 app.use("/", express.static(__dirname+'/asset'));
