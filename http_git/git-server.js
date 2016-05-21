@@ -1,6 +1,7 @@
 "use strict";
 const config  = require("$custom/config");
 const http    = require('http');
+const httpProxy = require('http-proxy');
 const Q 			= require('q');
 const moment 	= require('moment');
 const repos 	= require('pushover')(config.source, { autoCreate: false });
@@ -11,16 +12,39 @@ const db 		  = require("$custom/touno-db").mysql.connect();
 
 module.exports = { 
   listen: function(){
-    var git = http.createServer(function (req, res) { 
-      auth.access(req.headers).then(function(next){
-        if(next) {
-          repos.handle(req, res);
-        } else {
-          res.statusCode = 401;
-          res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
-          res.end();
-        }
-      });
+    var proxy = new httpProxy.createProxyServer({
+      target: {
+        host: 'localhost',
+        port: 8220,
+        ws: true
+      }
+    });
+
+    var git = http.createServer(function (req, res) {
+      if(!/Mozilla\/[0-9\.]+/ig.exec(req.headers['user-agent'])) {
+        auth.access(req.headers).then(function(next){
+          if(next) {
+            repos.handle(req, res);
+          } else {
+            res.statusCode = 401;
+            res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
+            res.end();
+          }e
+        });
+      } else {
+        proxy.web(req, res);
+        proxy.on('error', function (err, req, res) {
+          res.writeHead(500, {
+            'Content-Type': 'text/plain'
+          });
+
+          res.end('Something went wrong. And we are reporting a custom error message.');
+        });
+      }
+    });
+
+    git.on('upgrade', function (req, socket, head) {
+      proxy.ws(req, socket, head);
     });
 
     // EVENT

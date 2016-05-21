@@ -2,7 +2,6 @@
 
 const express = require('express')();
 const http 		= require("http").createServer(express);
-const morgan  = require('morgan');
 const moment  = require('moment');
 const config  = require('$custom/config');
 const db      = require("$custom/touno-db").mysql.connect();
@@ -22,7 +21,6 @@ if(!/^5\./.exec(process.versions.node) && !/^6\./.exec(process.versions.node)) {
 git.listen();
 
 // LISTEN APISERVER //
-express.use(morgan('dev'));
 express.use('/api',[], api);
 express.get('/', function(req, res){ res.end(); });
 
