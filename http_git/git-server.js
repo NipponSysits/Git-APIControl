@@ -15,7 +15,7 @@ module.exports = {
     var proxy = new httpProxy.createProxyServer({
       target: {
         host: 'local-web',
-        port: 8220,
+        port: 3000,
         ws: true
       }
     });
