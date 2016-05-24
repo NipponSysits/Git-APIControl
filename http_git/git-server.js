@@ -14,7 +14,7 @@ module.exports = {
   listen: function(){
     var proxy = new httpProxy.createProxyServer({
       target: {
-        host: 'localhost',
+        host: 'local-web',
         port: 8220,
         ws: true
       }
