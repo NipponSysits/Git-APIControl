@@ -50,8 +50,8 @@ module.exports = function(push) {
 	 //    	console.log('----');
 	 //    	console.log(logs);
 	 //    	console.log('----');
-	 //    	// 'git --no-pager log --all --format=%H[--]%ae[--]%B[--]%ai'
-	 //    	// ([0-9a-f]+?)\[--\]([0-9a-f ]+?)\[--\](.*?@.*?)\[--\]([\W\w]+?)\[--\]([0-9\-\: ]+).+0700
+	 //    	// git --no-pager log --all --format=]%ai%n[]%H%n[]%P%n[]%ae%n[]%B%n[
+	 //    	// \](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n\[\]([\W\w]+?)\[
 
 	 //    	// CHANGE PEATURN HEAD
 	 //   //  	var logHead = /From:.(.*?)\nDate:.(.*)\nSubject:.\[PATCH\].([\S|\s]*)?\n\n/g.exec(logs);
