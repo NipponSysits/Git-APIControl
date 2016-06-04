@@ -8,7 +8,7 @@ const repos 	= require('pushover')(config.source, { autoCreate: false });
 
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
-const db 		  = require("$custom/touno-db").mysql.connect();
+const db 		  = require("$custom/mysql").connect();
 
 module.exports = { 
   listen: function(){

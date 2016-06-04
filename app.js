@@ -4,12 +4,14 @@ const express = require('express')();
 const http 		= require("http").createServer(express);
 const moment  = require('moment');
 const config  = require('$custom/config');
-const db      = require("$custom/touno-db").mysql.connect();
+const db      = require("$custom/mysql").connect();
 const cron 		= require('cron');
 
 // const io      = require('socket.io').listen(api);
 const git     = require("./http_git/git-server");
 const api     = require("./http_api/api-server");
+
+console.log('arg', config.arg);
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
 if(!/^5\./.exec(process.versions.node) && !/^6\./.exec(process.versions.node)) {

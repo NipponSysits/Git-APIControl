@@ -1,8 +1,9 @@
 const config  = require("$custom/config");
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
-const mongo 		= require("$custom/touno-db").mongo;
-const db 				= require("$custom/touno-db").mysql.connect();
+const Q 				= require('q');
+const mongo 		= require("$custom/schema");
+const db 				= require("$custom/mysql").connect();
 const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
@@ -12,6 +13,7 @@ module.exports = function(push) {
   	var infoTime = moment().format(' HH:mm:ss');
     var dirRepository = config.source+'/'+push.repo;
     var sinceFormat = 'ddd, D MMM YYYY HH:mm:ss ZZ';
+    var access = {};
   //   var _option = { to: [] }
 		// var _ejs = { 
 		//   commit_index: 22,
@@ -32,26 +34,76 @@ module.exports = function(push) {
 		//   width_detail: 680,
 		//   graph: []
 		// }
+		
+    var getTotalList = [ 'rev-list', '--all', '--count' ];
+    var RegexCommit = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/ig;
+    // var getHead = [ '--no-pager','show', push.commit,'--pretty=medium','--date=iso','--name-status' ]; 
 
 		auth.username(push.headers).then(function(user){
-	 //    var getTotalList = [ 'rev-list', '--all', '--count' ];
-	 //    var getHead = [ '--no-pager','show', push.commit,'--pretty=medium','--date=iso','--name-status' ]; 
+  		console.log(chalk.green(infoTime), "logs", user.fullname, "push",chalk.green(push.repo, ':', push.branch));
+			access.user_id = user.user_id;
+			return db.query('SELECT repository_id FROM repositories WHERE dir_name = :name', { name: push.repo })
+		}).then(function(repo){
+			access.repository_id = repo[0].repository_id;
+	    var def = Q.defer();
+			var findCommits = mongo.Commit.findOne({ 'repository_id': access.repository_id }).sort({since : -1});
+			findCommits.exec(function(err, result){
+		    if (err) { def.reject(); }
+		    def.resolve(result);
+			});
+	    return def.promise;
+		}).then(function(commit){
+
 
 	 //    getHead = getHead.map(function(arg){ return arg === '0000000000000000000000000000000000000000' ? '-n 1' : arg; });
 
   // 		var repo = push.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
-    	console.log(chalk.green(infoTime), "logs", user.fullname, "push",chalk.green(repo, ':', push.branch));
+
+
 		// 	console.log(chalk.yellow('git', getTotalList.join(' ')));
-  //   	return control.cmd('git', getTotalList, dirRepository).then(function(index){
-	 //    	// _ejs.commit_index = index.replace(/[\n|\r]/g,'');
-  // 			console.log(chalk.yellow('git', getHead.join(' ')));
-	 //    	return control.cmd('git', getHead, dirRepository);
-	    }); //.then(function(logs){
-	 //    	console.log('----');
-	 //    	console.log(logs);
-	 //    	console.log('----');
-	 //    	// git --no-pager log --all --format=]%ai%n[]%H%n[]%P%n[]%ae%n[]%B%n[
-	 //    	// \](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n\[\]([\W\w]+?)\[
+  //   	return control.cmd('git', getTotalList, dirRepository)
+		// }).then(function(index){
+	 //    	var commit_index = index.replace(/[\n|\r]/g,'');
+
+
+  		var logFormat = [ '--no-pager', 'log', '--all', `--format=[]%ci%n[]%H%n[]%P%n[]%ae%n'%B'` ]; 
+  		if(commit) logFormat.push(`--since="${moment(commit.since, sinceFormat).add(1, 'seconds').format(sinceFormat)}"`);
+
+			console.log(chalk.yellow('git', logFormat.join(' ')));
+    	return control.cmd('git', logFormat, dirRepository);
+    }).then(function(logs){
+	    var def = Q.defer();
+
+    	let worng = 0, right = 0;
+    	let regexLogs = logs.match(/\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/ig);
+    	regexLogs.forEach(function(item){
+    		let commit_log = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/g.exec(item);
+
+    		let data = {
+    			since: new Date(commit_log[1]),
+    			commit_id: commit_log[2],
+    			parent_id: commit_log[3], 
+    			repository_id: access.repository_id,
+    			email: commit_log[4], 
+    			comment: commit_log[5].trim(), 
+    		} 
+
+				let log = new mongo.Commit(data), done = 0;
+				log.save(function (err, log) {
+	        if (err) {
+            console.log(err);
+	        } else {
+            done++;
+            if (done == regexLogs.length) {
+              def.resolve(true);
+            }
+	        }
+				}); 
+    	});
+	    return def.promise;
+
+
+// 
 
 	 //    	// CHANGE PEATURN HEAD
 	 //   //  	var logHead = /From:.(.*?)\nDate:.(.*)\nSubject:.\[PATCH\].([\S|\s]*)?\n\n/g.exec(logs);
@@ -159,9 +211,9 @@ module.exports = function(push) {
 	 //  	} else {
 	 //   		return control.email('changeset-email', _option, _ejs, push);
 	 //  	}
-  //   }).catch(function(ex){
-  //   	console.log(chalk.red(infoTime), chalk.red('catch--push'), ex);
-  //   });
+    }).catch(function(ex){
+    	console.log(chalk.red(infoTime), chalk.red('catch--push'), ex);
+    });
 
   });
 }
