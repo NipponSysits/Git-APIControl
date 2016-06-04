@@ -1,3 +1,4 @@
+"use strict";
 const config  = require("$custom/config");
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
