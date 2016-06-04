@@ -36,7 +36,7 @@ module.exports = function(push) {
 		// }
 		
     var getTotalList = [ 'rev-list', '--all', '--count' ];
-    var RegexCommit = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/ig;
+    var RegexCommit = 0;
     // var getHead = [ '--no-pager','show', push.commit,'--pretty=medium','--date=iso','--name-status' ]; 
 
 		auth.username(push.headers).then(function(user){
@@ -67,41 +67,35 @@ module.exports = function(push) {
 
 
   		var logFormat = [ '--no-pager', 'log', '--all', `--format=[]%ci%n[]%H%n[]%P%n[]%ae%n'%B'` ]; 
-  		if(commit) logFormat.push(`--since="${moment(commit.since, sinceFormat).add(1, 'seconds').format(sinceFormat)}"`);
-
+  		if(commit) {
+  			console.log('since_date', commit.since);
+  			since_date = moment(commit.since).add(1, 'seconds').format(sinceFormat);
+  			logFormat.push(`--since="${since_date}"`);
+			}
 			console.log(chalk.yellow('git', logFormat.join(' ')));
     	return control.cmd('git', logFormat, dirRepository);
     }).then(function(logs){
-	    var def = Q.defer();
 
-    	let worng = 0, right = 0;
-    	let regexLogs = logs.match(/\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/ig);
-    	regexLogs.forEach(function(item){
+    	let regexLogs = logs.match(/\[\][\W\w]*?'[\W\w]*?'/ig).map(function(item){
     		let commit_log = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/g.exec(item);
-
-    		let data = {
-    			since: new Date(commit_log[1]),
-    			commit_id: commit_log[2],
-    			parent_id: commit_log[3], 
-    			repository_id: access.repository_id,
-    			email: commit_log[4], 
-    			comment: commit_log[5].trim(), 
-    		} 
-
-				let log = new mongo.Commit(data), done = 0;
-				log.save(function (err, log) {
-	        if (err) {
-            console.log(err);
-	        } else {
-            done++;
-            if (done == regexLogs.length) {
-              def.resolve(true);
-            }
-	        }
-				}); 
+    		return (function(){
+    			let def = Q.defer();
+					let log = new mongo.Commit({
+	    			since: new Date(commit_log[1]),
+	    			commit_id: commit_log[2],
+	    			parent_id: commit_log[3], 
+	    			repository_id: access.repository_id,
+	    			email: commit_log[4], 
+	    			comment: commit_log[5].trim(), 
+	    		});
+					log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
+	    		return def.promise;
+    		})() 
     	});
-	    return def.promise;
-
+    	RegexCommit = regexLogs.length;
+	    return Q.all(regexLogs);
+    }).then(function(logs){
+    	console.log(`git log ${RegexCommit} items saved.`);
 
 // 
 
@@ -162,8 +156,6 @@ module.exports = function(push) {
 	 //    });
 
 
-
-  //   }).then(function(logs){
   //   	logs = logs.match(/[0-9a-f]+..*/g);
   //   	console.log('---');
   //   	console.log(logs);
