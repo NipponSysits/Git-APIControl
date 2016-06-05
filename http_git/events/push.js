@@ -34,7 +34,7 @@ module.exports = function(push) {
 	    return def.promise;
 		}).then(function(commit){
 
-  		var logFormat = [ '--no-pager', 'log', '--all', `--format=[]%ci%n[]%H%n[]%P%n[]%ae%n'%B'` ]; 
+  		var logFormat = [ '--no-pager', 'log', '--all', `--format=[]%ci%n[]%H%n[]%P%n[]%cn#%ae%n'%B'` ]; 
   		if(commit) {
   			let since_date = moment(commit.since).add(1, 'seconds').format(sinceFormat);
   			logFormat.push(`--since="${since_date}"`);
@@ -52,7 +52,7 @@ module.exports = function(push) {
 						let log = new mongo.History({
 							commit_id: push.commit,
 		    			repository_id: access.repository_id,
-		    			username: access.username, 
+		    			author: access.fullname, 
 		    			email: access.email, 
 		    			subject: `removed your branch is '${push.branch}'`, 
 		    			comment: null, 
@@ -65,31 +65,27 @@ module.exports = function(push) {
 	  	} else {
 	    	logs.match(/\[\][\W\w]*?'[\W\w]*?'/ig).forEach(function(item){
 	    		let commit_log = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/g.exec(item);
+  				let author = commit_log[4].trim().split(/#/), comment = commit_log[5].trim().split(/\n\n/);
 
-					mongo.User.findOne({ 'profile.email': commit_log[4] }, function (err, person) {
-					  if (err) def.reject(err);
-    				let comment = commit_log[5].trim().split(/\n\n/);
-    				person = person || { profile: {} };
-		    		// commit logs
-		    		regexLogs.push((function(){
-		    			let def = Q.defer();
-							let log = new mongo.Commit({
-			    			commit_id: commit_log[2],
-			    			repository_id: access.repository_id,
-			    			username: person.username || commit_log[4],
-			    			email: person.profile.email || commit_log[4], 
-			    			since: new Date(commit_log[1]),
-			    			parent_id: commit_log[3], 
-			    			subject: comment[0], 
-			    			logs: true,
-			    			comment: comment[1] || null, 
-			    		});
-							log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
-			    		return def.promise;
-		    		})());
+	    		// commit logs
+	    		regexLogs.push((function(){
+	    			let def = Q.defer();
+						let log = new mongo.Commit({
+		    			commit_id: commit_log[2],
+		    			repository_id: access.repository_id,
+		    			author: author[0],
+		    			email: author[1], 
+		    			since: new Date(commit_log[1]),
+		    			parent_id: commit_log[3], 
+		    			subject: comment[0], 
+		    			logs: true,
+		    			comment: comment[1] || null, 
+		    		});
+						log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
+		    		return def.promise;
+	    		})());
 
 
-					});
 
 
 	    		// // comment logs
