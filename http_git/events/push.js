@@ -84,33 +84,10 @@ module.exports = function(push) {
 						log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
 		    		return def.promise;
 	    		})());
-
-
-
-
-	    		// // comment logs
-	    		// regexLogs.push((function(){
-	    		// 		let def = Q.defer();
-							
-							//   if (err) def.reject(err); 
-		    	// 			let comment = commit_log[5].trim().split(/\n\n/);
-
-							// 	let log = new mongo.History({
-				   //  			repository_id: access.repository_id,
-				   //  			username: (person || {}).username, 
-				   //  			email: commit_log[4], 
-				   //  			subject: comment[0], 
-				   //  			comment: comment[1] || null, 
-				   //  			since: new Date(commit_log[1]),
-				   //  		});
-							// 	log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
-							// });
-		    	// 		return def.promise;
-	    		// })());
 	    	});
 	  	}
 
-    	RegexCommit = regexLogs.length / 2;
+    	RegexCommit = regexLogs.length;
 
 	    return Q.all(regexLogs);
     }).then(function(logs){
