@@ -50,11 +50,13 @@ module.exports = function(push) {
     				let def = Q.defer();
 
 						let log = new mongo.History({
+							commit_id: push.commit,
 		    			repository_id: access.repository_id,
 		    			username: access.username, 
 		    			email: access.email, 
-		    			suject: `removed your branch is '${push.branch}'`, 
+		    			subject: `removed your branch is '${push.branch}'`, 
 		    			comment: null, 
+		    			logs: false,
 		    			since: new Date(),
 		    		});
 						log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
@@ -64,40 +66,51 @@ module.exports = function(push) {
 	    	logs.match(/\[\][\W\w]*?'[\W\w]*?'/ig).forEach(function(item){
 	    		let commit_log = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/g.exec(item);
 
-	    		// commit logs
-	    		regexLogs.push((function(){
-	    			let def = Q.defer();
-						let log = new mongo.Commit({
-		    			since: new Date(commit_log[1]),
-		    			commit_id: commit_log[2],
-		    			parent_id: commit_log[3], 
-		    			repository_id: access.repository_id,
-		    			email: commit_log[4], 
-		    			comment: commit_log[5].trim(), 
-		    		});
-						log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
-		    		return def.promise;
-	    		})());
+					mongo.User.findOne({ 'profile.email': commit_log[4] }, function (err, person) {
+					  if (err) def.reject(err);
+    				let comment = commit_log[5].trim().split(/\n\n/);
+    				person = person || { profile: {} };
+		    		// commit logs
+		    		regexLogs.push((function(){
+		    			let def = Q.defer();
+							let log = new mongo.Commit({
+			    			commit_id: commit_log[2],
+			    			repository_id: access.repository_id,
+			    			username: person.username || commit_log[4],
+			    			email: person.profile.email || commit_log[4], 
+			    			since: new Date(commit_log[1]),
+			    			parent_id: commit_log[3], 
+			    			subject: comment[0], 
+			    			logs: true,
+			    			comment: comment[1] || null, 
+			    		});
+							log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
+			    		return def.promise;
+		    		})());
 
-	    		// comment logs
-	    		regexLogs.push((function(){
-	    				let def = Q.defer();
-							mongo.User.findOne({ 'profile.email': commit_log[4] }, 'username', function (err, person) {
-							  if (err) def.reject(err); 
-		    				let comment = commit_log[5].trim().split(/\n\n/);
 
-								let log = new mongo.History({
-				    			repository_id: access.repository_id,
-				    			username: (person || {}).username, 
-				    			email: commit_log[4], 
-				    			subject: comment[0], 
-				    			comment: comment[1] || null, 
-				    			since: new Date(commit_log[1]),
-				    		});
-								log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
-							});
-		    			return def.promise;
-	    		})());
+					});
+
+
+	    		// // comment logs
+	    		// regexLogs.push((function(){
+	    		// 		let def = Q.defer();
+							
+							//   if (err) def.reject(err); 
+		    	// 			let comment = commit_log[5].trim().split(/\n\n/);
+
+							// 	let log = new mongo.History({
+				   //  			repository_id: access.repository_id,
+				   //  			username: (person || {}).username, 
+				   //  			email: commit_log[4], 
+				   //  			subject: comment[0], 
+				   //  			comment: comment[1] || null, 
+				   //  			since: new Date(commit_log[1]),
+				   //  		});
+							// 	log.save(function (err, log) { if (err) def.reject(err); else def.resolve(log);	}); 
+							// });
+		    	// 		return def.promise;
+	    		// })());
 	    	});
 	  	}
 
