@@ -10,7 +10,7 @@ module.exports = function(info) {
     return auth.permission(info.repo, user).then(function(permission){
       var infoTime = moment().format(' HH:mm:ss');
       if(permission.accept) {
-        console.log(chalk.yellow(infoTime), "logs", user.fullname, "info", repo);
+        // console.log(chalk.yellow(infoTime), "logs", user.fullname, "info", repo);
         info.accept();
       } else {
         console.log(chalk.red(infoTime), chalk.red('reject'), user.fullname, info.repo, permission.error);
