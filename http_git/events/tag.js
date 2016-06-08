@@ -1,4 +1,5 @@
 "use strict";
+const auth 		= require("$custom/touno-git").auth;
 const moment    = require("moment");
 const chalk   	= require('chalk');
 

@@ -63,7 +63,8 @@ module.exports = function(push) {
 	    			return def.promise;
 	    		})());
 	  	} else {
-	    	logs.match(/\[\][\W\w]*?'[\W\w]*?'/ig).forEach(function(item){
+	  		let cmdlogs = logs.match(/\[\][\W\w]*?'[\W\w]*?'/ig);
+	    	(cmdlogs || []).forEach(function(item){
 	    		let commit_log = /\[\](.+?)\n\[\]([a-f0-9]{40})\n\[\]([a-f0-9 ]{81}|[a-f0-9]{40}|)\n\[\](.+)\n'([\W\w]+?)'/g.exec(item);
   				let author = commit_log[4].trim().split(/#/), comment = commit_log[5].trim().split(/\n\n/);
 
