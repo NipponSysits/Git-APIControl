@@ -49,7 +49,7 @@ module.exports = function(push) {
 	    		regexLogs.push((function(){
     				let def = Q.defer();
 
-						let log = new mongo.History({
+						let log = new mongo.Commit({
 							commit_id: push.commit,
 		    			repository_id: access.repository_id,
 		    			author: access.fullname, 
