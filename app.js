@@ -39,6 +39,12 @@ io.on('connection', function(socket){
   client++;
   console.log('client-update', client);
 
+  socket.on('repository-file', function(data){
+    console.log(data);
+    
+    socket.emit('repository-file', 0);
+  });
+
   socket.on('checkin-stats', function(session){
     var sql = 'select count(*) as access from user ' +
               'where username=:username and md5(password)=:key';

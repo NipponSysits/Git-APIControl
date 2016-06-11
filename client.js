@@ -1,7 +1,7 @@
 "use strict";
 
 const config = require('$custom/config');
-const socket = require('$custom/socket').clent;
+const socket = require('$custom/sentinel').clent;
 
 socket.on('connect', function(){
 	console.log('client connecting.');
