@@ -1,43 +1,8 @@
-#nginx: 
-#  restart: always 
-#  image: 'jwilder/nginx-proxy' 
-#  hostname: nginx
-#  container_name: nginx
-#  ports: 
-#    - '80:80' 
-#    - '443:443' 
-#  volumes: 
-#    - '/app/nginx/vhost.d:/etc/nginx/vhost.d' 
-#    - '/app/nginx/html:/usr/share/nginx/html' 
-#    - '/app/nginx/certs:/etc/nginx/certs:ro' 
-#    - '/app/nginx/conf.d:/etc/nginx/conf.d' 
-#    - '/var/run/docker.sock:/tmp/docker.sock:ro' 
-#  environment: 
-#    - TZ=Asia/Bangkok 
-#lets: 
-#  restart: always 
-#  image: jrcs/letsencrypt-nginx-proxy-companion 
-#  hostname: lets
-#  container_name: lets
-#  volumes_from: 
-#    - nginx 
-#  volumes: 
-#    - '/app/nginx/certs:/etc/nginx/certs:rw' 
-#    - '/var/run/docker.sock:/var/run/docker.sock:ro' 
-#  links: 
-#    - nginx 
-#  environment: 
-#    - TZ=Asia/Bangkok
-
-
 mongodb:
   restart: always
   image: sameersbn/mongodb:latest
-#  hostname: mongodb
-#  ports:
-#    - "20400:27017"
   volumes:
-    - /app/mongodb:/var/lib/mongodb
+    - /debugerr/mongodb:/var/lib/mongodb
   environment:
     - TZ=Asia/Bangkok
 mysql:
@@ -47,8 +12,8 @@ mysql:
 #  ports:
 #    - "20410:3306"
   volumes:
-    - /app/mysql/data:/var/lib/mysql
-    - /app/mysql/mysql.cnf:/etc/mysql/my.cnf
+    - /debugerr/mysql/data:/var/lib/mysql
+    - /debugerr/mysql/mysql.cnf:/etc/mysql/my.cnf
   environment:
     - MYSQL_USER=debugerr
     - MYSQL_ROOT_PASSWORD=!deBUG_Error
@@ -60,8 +25,8 @@ redis:
 # ports:
 #   - "6379:6379"
   volumes:
-    - /app/redis/data:/data
-    - /app/redis/redis.cnf:/usr/local/etc/redis/redis.conf
+    - /debugerr/redis/data:/data
+    - /debugerr/redis/redis.cnf:/usr/local/etc/redis/redis.conf
   environment: 
     - TZ=Asia/Bangkok
 
@@ -74,14 +39,12 @@ sentinel:
   links:
     - mysql:local-mysql
     - mongodb:local-mongodb
-#    - debugerr:local-web
-#  extra_hosts:
-#    - "mail.ns.co.th:192.168.10.2"
   ports:
     - '80:810'
+    
 #    - '811:811'
   volumes:
-    - '/data/app-sentinel:/data/app'
+    - '/debugerr/:/data/app'
     - '/data/debugerr-source:/data/source'
     - '/data/debugerr-package:/data/package'
     - '/data/debugerr-content:/data/content'
@@ -93,7 +56,7 @@ debugerr:
   image: node:0.10.44
   hostname: debugerr
   container_name: debugerr
-  command: node /app/bundle/main.js
+  command: node /debugerr/bundle/main.js
   links:
     - mysql:local-mysql
     - mongodb:local-mongodb
