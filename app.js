@@ -4,6 +4,7 @@ const express = require('express')();
 const http 		= require("http").createServer(express);
 const moment  = require('moment');
 const config  = require('$custom/config');
+const control = require("$custom/touno-git").control;
 const db      = require("$custom/mysql").connect();
 const cron 		= require('cron');
 
@@ -38,13 +39,7 @@ var client = 0;
 io.on('connection', function(socket){
   client++;
   console.log('client-update', client);
-
-  socket.on('repository-file', function(data){
-    console.log(data);
-    
-    socket.emit('repository-file', 0);
-  });
-
+  
   socket.on('checkin-stats', function(session){
     var sql = 'select count(*) as access from user ' +
               'where username=:username and md5(password)=:key';
