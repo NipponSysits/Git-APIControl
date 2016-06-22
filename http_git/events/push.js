@@ -91,7 +91,7 @@ module.exports = function(push) {
     	RegexCommit = regexLogs.length;
 
 	    return Q.all(regexLogs);
-    }).then(function(logs){
+    }).then(function(){
   		console.log(chalk.green(infoTime), `logs ${RegexCommit} items saved.`, access.fullname, "push",chalk.green(push.repo, ':', push.branch));
     }).catch(function(ex){
     	console.log(chalk.red(infoTime), chalk.red('catch--push'), ex);
