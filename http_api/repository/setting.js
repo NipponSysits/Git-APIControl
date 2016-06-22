@@ -1,7 +1,6 @@
 "use strict";
 const express = require('express');
 const router  = express.Router();
-const bodyParser  = require('body-parser');
 const moment  = require('moment');
 const config  = require('$custom/config');
 const control = require("$custom/touno-git").control;
@@ -19,7 +18,7 @@ router.get('/update', function(req, res){
 	res.end('update');
 });
 
-router.get('/files/:collection/:repository', [bodyParser.json()],function(req, res){
+router.get('/files/:collection/:repository', function(req, res){
   console.log(req.params);
 	res.end('files');
     // let sql = `SELECT dir_name, config FROM repositories WHERE repository_id = :repository_id`;
