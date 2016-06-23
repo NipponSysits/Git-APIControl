@@ -4,13 +4,14 @@ const express = require('express')();
 const http 		= require("http").createServer(express);
 const moment  = require('moment');
 const config  = require('$custom/config');
+const mongo   = require("$custom/schema");
 const control = require("$custom/touno-git").control;
 const db      = require("$custom/mysql").connect();
 const cron 		= require('cron');
 
 // const io      = require('socket.io').listen(api);
-const git     = require("./http_git/git-server");
-const api     = require("./http_api/api-server");
+const git     = require("./route-git/git-server");
+const api     = require("./route-api/api-server");
 
 console.log('arg', config.arg);
 
@@ -37,6 +38,13 @@ const io = require( "socket.io" )(http);
 
 var client = 0;
 io.on('connection', function(socket){
+
+  // var findCommits = mongo.Repository.findOne({ 'user_id': 0 });
+  // findCommits.exec(function(err, result){
+  //   if (err) { def.reject(); }
+  //   def.resolve(result);
+  // });
+
   client++;
   console.log('client-update', client);
   
