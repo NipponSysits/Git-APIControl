@@ -78,9 +78,9 @@ module.exports = function(push) {
 						let cmdWin = [ '/c', '..\\..\\..\\..\\cmd\\list-files',  $scopt.master ];
 
 				    if(config.platfrom === 'LINUX') {
-				      return control.cmd('git', cmdLinux, dirRepository).then(event.filePrepare);
+				      return control.cmd('git', cmdLinux, dirRepository).then(event.filePrepare).then(event.repoPrepare);
 				    } else {
-				      return control.cmd('cmd', cmdWin, dirRepository).then(event.filePrepare);
+				      return control.cmd('cmd', cmdWin, dirRepository).then(event.filePrepare).then(event.repoPrepare);
 				    }
 					}
 				});
@@ -88,7 +88,6 @@ module.exports = function(push) {
     	filePrepare: function(git){
 				let def = Q.defer();
     		let CommitFile = git.match(/(.*)\|(.*)\|(.*)\n/ig) || [];
-  			console.log(chalk.green(infoTime), `added ${CommitFile.length} items.`, $access.fullname, "prepare",chalk.green(push.repo, ':', push.branch));
 		    CommitFile.forEach(function(item){
 		      let logs = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)\|(.*)\|(.*)/ig.exec(item);
 		      $scopt.files.push({
@@ -100,28 +99,32 @@ module.exports = function(push) {
 		      });
 		    });
 
-		    console.log();
-		    console.log('$access', $access);
-		    console.log();
-		    console.log('$scopt', $scopt);
-		    console.log();
-
 				mongo.Repository.findOne({ 'repository_id': $scopt.repository_id }).exec(function(err, result){
-			    if (err) { def.reject(); }
-			    if(result) {
-
-			    } else {
-			    	
-			    }
-			    def.resolve();
+  				console.log(chalk.green(infoTime), `${result?`updated`:`added`} ${CommitFile.length} items.`, $access.fullname, "prepare repository.");
+			    if (err) { def.reject(); } else { def.resolve(result ? false : true); }
 				});
-
-
 		    
-				// let commited = new mongo.Repository($scopt);
-				// commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
-  		}
+  		},
+    	repoPrepare: function(InsertEvent){
+				let def = Q.defer();
+    		let callback = function (err, result) { 
+    			if (err) def.reject(err); else def.resolve();	
+    		}
+    		if(InsertEvent) {
+					let commited = new mongo.Repository($scopt);
+					commited.save(callback); 
+    		} else {
+    			let updated = {
+						master: $scopt.master,
+						branch: $scopt.branch,
+						files: $scopt.files
+    			}
+    			mongo.Repository.update({ repository_id: $scopt.repository_id }, { $set: updated }, callback);
+    		}
+    		return def.promise;
+  		},
+
     }
 
 		auth.username(push.headers).then(function(user){
@@ -132,7 +135,7 @@ module.exports = function(push) {
 	    $scopt.repository_id = repo[0].repository_id;
 	    $scopt.name = push.repo;
 	    $scopt.title = repo[0].title;
-  		$scopt.description = repo[0].description;
+  		$scopt.description = repo[0].description || '';
 			$access.repository_id = repo[0].repository_id;
 
 	    var def = Q.defer();
