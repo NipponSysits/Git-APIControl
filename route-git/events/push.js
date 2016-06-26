@@ -70,40 +70,48 @@ module.exports = function(push) {
 						$scopt.branch.push(branch[2]);
 						if(branch[1] === '*') $scopt.master = branch[2];
 					});
+
 					return control.cmd('git', diffTree, dirRepository);
 				}).then(function(files){
-					if(/A\W+.*\n/ig.test(files) && !event.getTree) {
+					if(/[AD]\W+.*\n/ig.test(files) && !event.getTree) {
 						event.getTree = true;
-						let cmdLinux = [ 'ls-tree','-l', $scopt.master, '| while read filename; do (echo "$filename|$(git log -1 --format="%ci|%s" -- $filename)") done' ];
-						let cmdWin = [ '/c', '..\\..\\..\\..\\cmd\\list-files',  $scopt.master ];
-
-				    if(config.platfrom === 'LINUX') {
-				      return control.cmd('git', cmdLinux, dirRepository).then(event.filePrepare).then(event.repoPrepare);
-				    } else {
-				      return control.cmd('cmd', cmdWin, dirRepository).then(event.filePrepare).then(event.repoPrepare);
-				    }
+			      return control.cmd('git', [ '--no-pager','ls-tree','-l', $scopt.master ], dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
 					}
 				});
   		},
     	filePrepare: function(git){
-				let def = Q.defer();
-    		let CommitFile = git.match(/(.*)\|(.*)\|(.*)\n/ig) || [];
-		    CommitFile.forEach(function(item){
-		      let logs = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)\|(.*)\|(.*)/ig.exec(item);
-		      $scopt.files.push({
-		        ext: logs[2].trim() === '-' ? null : (/\.[\w\d]+$/gm.exec(logs[3]) || [])[0] || null,
-		        size: logs[2].trim() === '-' ? 0 : parseInt(logs[2].trim()),
-		        filename: logs[3],
-		        since: logs[4],
-		        comment: logs[5].replace(/\n/g, '')
-		      });
+    		let items = []
+    		let CommitFile = git.match(/.*\n/ig) || [];
+		    CommitFile.forEach(function(logs){
+		    	let filename = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)/g.exec(logs);
+		    	let type = filename[1].trim();
+		    	let size = filename[2].trim();
+		    	let name = filename[3].replace(/\n/g, '').trim();
+		    	if(name.toLowerCase() === 'readme.md') {
+		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
+		    			$scopt.readme = text;
+		    		}));
+		    	}
+		      items.push(control.cmd('git', [ 'log','-1','--format="'+type+'|'+size+'|'+name+'|%ci|%s"','--',name ], dirRepository).then(event.fileLogs))
 		    });
-
+		    return Q.all(items);
+  		},
+    	fileLogs: function(git){
+	      let logs = /"(.*)\|(.*)\|(.*)\|(.*)\|(.*)"/ig.exec(git);
+	      $scopt.files.push({
+	        ext: logs[2].trim() === '-' ? null : (/\.[\w\d]+$/gm.exec(logs[3]) || [])[0] || null,
+	        size: logs[2].trim() === '-' ? 0 : parseInt(logs[2].trim()),
+	        filename: logs[3],
+	        since: logs[4],
+	        comment: logs[5].replace(/\n/g, '')
+		    });
+  		},
+  		repoCheck: function(){
+				let def = Q.defer();
 				mongo.Repository.findOne({ 'repository_id': $scopt.repository_id }).exec(function(err, result){
-  				console.log(chalk.green(infoTime), `${result?`updated`:`added`} ${CommitFile.length} items.`, $access.fullname, "prepare repository.");
+  				console.log(chalk.green(infoTime), `${result?`updated`:`added`} filenames.`, $access.fullname, "prepare repository.");
 			    if (err) { def.reject(); } else { def.resolve(result ? false : true); }
 				});
-		    
     		return def.promise;
   		},
     	repoPrepare: function(InsertEvent){
