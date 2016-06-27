@@ -25,7 +25,7 @@ module.exports = function(push) {
     var RegexCommit = 0;
 
     var event = {
-    	// getTree: false,
+    	getTree: false,
     	logBranchRemoved: function(){
 				let def = Q.defer();
 
@@ -73,25 +73,23 @@ module.exports = function(push) {
 
 					return control.cmd('git', diffTree, dirRepository);
 				}).then(function(files){
-					// if(/[AD]\W+.*\n/ig.test(files) && !event.getTree) {
-						// event.getTree = true;
-					let lsTree = [ '--no-pager','ls-tree','-l', $scopt.master ];
-		      return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
-					// } 
+					if(!event.getTree) {
+						event.getTree = true;
+						let lsTree = [ '--no-pager','ls-tree','-l', $scopt.master ];
+			      return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
+					} 
 				});
   		},
     	filePrepare: function(git){
     		let items = []
     		let CommitFile = git.match(/.*\n/ig) || [];
-	    	console.log();
-	    	console.log('Repository', push.repo);
+    		
 		    CommitFile.forEach(function(logs){
 		    	let filename = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)/g.exec(logs);
 		    	let type = filename[1].trim();
 		    	let size = filename[2].trim();
 		    	let name = filename[3].replace(/\n/g, '').trim();
 
-		    	console.log(name, size, type);
 
 		    	if(name.toLowerCase() === 'readme.md') {
 		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
