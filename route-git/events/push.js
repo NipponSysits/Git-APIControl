@@ -75,7 +75,7 @@ module.exports = function(push) {
 				}).then(function(files){
 					if(/[AD]\W+.*\n/ig.test(files) && !event.getTree) {
 						event.getTree = true;
-			      return control.cmd('git', [ '--no-pager','ls-tree','-l', $scopt.master ], dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
+			      return control.cmd('git', [ '--no-pager','ls-tree','-l',push.branch ], dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
 					}
 				});
   		},
@@ -88,7 +88,7 @@ module.exports = function(push) {
 		    	let size = filename[2].trim();
 		    	let name = filename[3].replace(/\n/g, '').trim();
 		    	if(name.toLowerCase() === 'readme.md') {
-		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
+		    		items.push(control.cmd('git', [ '--no-pager','show',push.branch+':'+name ], dirRepository).then(function(text){
 		    			$scopt.readme = text;
 		    		}));
 		    	}
