@@ -23,9 +23,10 @@ module.exports = function(push) {
     
     var RegexCommit = 0;
 
+		let lsTree = [ '--no-pager','ls-tree','-l',push.branch ];
 
     var event = {
-    	getTree: false,
+    	// getTree: false,
     	logBranchRemoved: function(){
 				let def = Q.defer();
 
@@ -73,12 +74,18 @@ module.exports = function(push) {
 
 					return control.cmd('git', diffTree, dirRepository);
 				}).then(function(files){
-					if(/[AD]\W+.*\n/ig.test(files) && !event.getTree) {
-						event.getTree = true;
-			      return control.cmd('git', [ '--no-pager','ls-tree','-l',push.branch ], dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
-					}
+					// if(/[AD]\W+.*\n/ig.test(files) && !event.getTree) {
+						// event.getTree = true;
+		      return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
+					// } 
 				});
   		},
+    // 	clonePrepare: function(pushed){
+    // 		if(!event.getTree) {
+    // 			event.getTree = true;
+				// 	return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
+    // 		}
+  		// },
     	filePrepare: function(git){
     		let items = []
     		let CommitFile = git.match(/.*\n/ig) || [];
