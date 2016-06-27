@@ -154,7 +154,7 @@ module.exports = function(push) {
 			$access.repository_id = repo[0].repository_id;
 
 	    var def = Q.defer();
-			var findCommits = mongo.Commit.findOne({ 'repository_id': $access.repository_id }).sort({since : -1});
+			var findCommits = mongo.Commit.findOne({ 'repository_id': $access.repository_id, logs: true }).sort({since : -1});
 			findCommits.exec(function(err, result){
 		    if (err) { def.reject(); }
 		    def.resolve(result);
