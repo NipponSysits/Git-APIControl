@@ -17,6 +17,7 @@ module.exports = function(push) {
     var $access = {};
 		var $scopt = {
 			master: 'master',
+			readme: undefined,
 			branch: [],
 			files: []
 		};
