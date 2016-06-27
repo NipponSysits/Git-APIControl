@@ -82,11 +82,16 @@ module.exports = function(push) {
     	filePrepare: function(git){
     		let items = []
     		let CommitFile = git.match(/.*\n/ig) || [];
+	    	console.log();
+	    	console.log('Repository', push.repo);
 		    CommitFile.forEach(function(logs){
 		    	let filename = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)/g.exec(logs);
 		    	let type = filename[1].trim();
 		    	let size = filename[2].trim();
 		    	let name = filename[3].replace(/\n/g, '').trim();
+
+		    	console.log(name, size, type);
+
 		    	if(name.toLowerCase() === 'readme.md') {
 		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
 		    			$scopt.readme = text;
@@ -125,6 +130,7 @@ module.exports = function(push) {
     		} else {
     			let updated = {
 						master: $scopt.master,
+						readme: $scopt.readme,
 						branch: $scopt.branch,
 						files: $scopt.files
     			}
