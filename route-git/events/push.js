@@ -91,11 +91,13 @@ module.exports = function(push) {
 		    	let name = filename[3].replace(/\n/g, '').trim();
 
 
+	    		$scopt.readme = new Buffer();
 		    	if(name.toLowerCase() === 'readme.md') {
 		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
 		    			$scopt.readme = text;
 		    		}));
 		    	}
+		    	
 		      items.push(control.cmd('git', [ 'log','-1','--format="'+type+'|'+size+'|'+name+'|%ci|%s"','--',name ], dirRepository).then(event.fileLogs))
 		    });
 		    return Q.all(items);
