@@ -16,7 +16,7 @@ mysql:
     - /debugerr/mysql/mysql.cnf:/etc/mysql/my.cnf
   environment:
     - MYSQL_USER=debugerr
-    - MYSQL_ROOT_PASSWORD=!deBUG_Error
+    - MYSQL_ROOT_PASSWORD=de!3UG
     - TZ=Asia/Bangkok
 redis:
   restart: always

@@ -91,7 +91,8 @@ module.exports = function(push) {
 		    	let name = filename[3].replace(/\n/g, '').trim();
 
 
-	    		$scopt.readme = new Buffer();
+	    		$scopt.readme = new Buffer("");
+
 		    	if(name.toLowerCase() === 'readme.md') {
 		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
 		    			$scopt.readme = text;
