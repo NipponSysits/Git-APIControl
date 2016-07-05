@@ -2,6 +2,7 @@
 const config  = require("$custom/config");
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
+const socket  = require('$custom/sentinel').clent;
 const Q 				= require('q');
 const mongo 		= require("$custom/schema");
 const db 				= require("$custom/mysql").connect();
@@ -21,7 +22,8 @@ module.exports = function(push) {
 			branch: [],
 			files: []
 		};
-    
+
+
     var RegexCommit = 0;
 
     var event = {
@@ -29,6 +31,7 @@ module.exports = function(push) {
     	logBranchRemoved: function(){
 				let def = Q.defer();
 
+				$access.body = `removed branch is '${push.branch}'`;
 				let commited = new mongo.Commit({
 					commit_id: push.commit,
     			repository_id: $access.repository_id,
@@ -57,6 +60,8 @@ module.exports = function(push) {
     			logs: true,
     			comment: comment[1] || null, 
     		}
+
+				$access.body = commit_log[5].trim();
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
@@ -160,6 +165,7 @@ module.exports = function(push) {
 
 		auth.username(push.headers).then(function(user){
 			$access = user;
+
   		console.log(chalk.green(infoTime), "logs", $access.fullname, "push",chalk.green(push.repo, ':', push.branch));
 			return db.query('SELECT repository_id, title, description FROM repositories WHERE dir_name = :name', { name: push.repo })
 		}).then(function(repo){
@@ -168,6 +174,9 @@ module.exports = function(push) {
 	    $scopt.title = repo[0].title;
   		$scopt.description = repo[0].description || '';
 			$access.repository_id = repo[0].repository_id;
+			$access.repo = push.repo;
+			$access.branch = push.branch;
+
 
 	    var def = Q.defer();
 			var findCommits = mongo.Commit.findOne({ 'repository_id': $access.repository_id, logs: true }).sort({since : -1});
@@ -195,12 +204,18 @@ module.exports = function(push) {
 		    		// commit logs
 		    		regexLogs.push(event.logPushed(item).then(event.folderPrepare));
 	    		});
-
   				RegexCommit = regexLogs.length;
     			return Q.all(regexLogs);
 	    	});
 	  	}
     }).then(function(){
+    	if(RegexCommit <= 1) {
+				$access.body = `logs ${RegexCommit} items saved.`;
+    	} else {
+				$access.body = `logs ${RegexCommit} items saved.`;
+    	}
+    	$access.event = 'pushed';
+    	socket.emit('push-notification', $access);
   		console.log(chalk.green(infoTime), `logs ${RegexCommit} items saved.`, $access.fullname, "push",chalk.green(push.repo, ':', push.branch));
     }).catch(function(ex){
     	console.log(chalk.red(infoTime), chalk.red('catch--logs'), ex);
