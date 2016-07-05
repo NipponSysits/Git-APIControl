@@ -64,20 +64,33 @@ module.exports = function(push) {
     	folderPrepare: function(pushed){
 				let diffTree = ['diff-tree', '--no-commit-id', '--name-status', '-r', pushed.commit_id];
 				let listBranch = [ 'show-branch','--list' ];
-				return control.cmd('git', listBranch, dirRepository).then(function(branchs){
-					(branchs.match(/.*\n/ig) || []).forEach(function(item){
-						let branch = /(\W).\[(.*)\]/g.exec(item);
-						$scopt.branch.push(branch[2]);
-						if(branch[1] === '*') $scopt.master = branch[2];
-					});
 
-					return control.cmd('git', diffTree, dirRepository);
-				}).then(function(files){
-					if(!event.getTree) {
-						event.getTree = true;
-						let lsTree = [ '--no-pager','ls-tree','-l', $scopt.master ];
-			      return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
-					} 
+
+				return control.cmd('git', diffTree, dirRepository).then(function(files){
+					let foundNewFile = false;
+					(files.match(/.*\n/ig) || []).forEach(function(item){
+						let filename = /([AMD])(.*)/g.exec(item);
+						if(filename[1] === 'A' && !event.getTree) {
+							foundNewFile = true;
+							event.getTree = true;
+							return false;
+						}
+					});
+					if(foundNewFile) {
+						console.log(' filename new -- update caches in mongodb');
+						return control.cmd('git', listBranch, dirRepository).then(function(branchs){
+							(branchs.match(/.*\n/ig) || []).forEach(function(item){
+								let branch = /(\W).\[(.*)\]/g.exec(item);
+								$scopt.branch.push(branch[2]);
+								if(branch[1] === '*') $scopt.master = branch[2];
+							});
+
+							return control.cmd('git', diffTree, dirRepository);
+						}).then(function(files){
+							let lsTree = [ '--no-pager','ls-tree','-l', $scopt.master ];
+				      return control.cmd('git', lsTree, dirRepository).then(event.filePrepare).then(event.repoCheck).then(event.repoPrepare);
+						});
+					}
 				});
   		},
     	filePrepare: function(git){
@@ -129,6 +142,7 @@ module.exports = function(push) {
     		if(InsertEvent) {
 					let commited = new mongo.Repository($scopt);
 					commited.save(callback); 
+					console.log('mongo.Repository.save -- ', { repository_id: $scopt.repository_id });
     		} else {
     			let updated = {
 						master: $scopt.master,
@@ -137,6 +151,7 @@ module.exports = function(push) {
 						files: $scopt.files
     			}
     			mongo.Repository.update({ repository_id: $scopt.repository_id }, { $set: updated }, callback);
+					console.log('mongo.Repository.update -- ', { repository_id: $scopt.repository_id });
     		}
     		return def.promise;
   		},
