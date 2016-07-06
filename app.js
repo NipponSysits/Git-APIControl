@@ -36,18 +36,18 @@ http.listen(config.api, function() {
 // LISTEN SOCKET API //
 const io = require( "socket.io" )(http);
 
-var client = 0;
+var client = -1;
 io.on('connection', function(socket){
-
-  // var findCommits = mongo.Repository.findOne({ 'user_id': 0 });
-  // findCommits.exec(function(err, result){
-  //   if (err) { def.reject(); }
-  //   def.resolve(result);
-  // });
-
   client++;
   console.log('client-update', client);
   
+  socket.on('no-client', function(){
+    client--;
+  });
+
+
+
+
   socket.on('checkin-stats', function(session){
     var sql = 'select count(*) as access from user ' +
               'where username=:username and md5(password)=:key';
@@ -61,10 +61,16 @@ io.on('connection', function(socket){
     
   	// { created: Date.now(), username: 'guest-' }
   });
-  // socket.on('client checkout', function(session){
-  // 	console.log('checkout', data);
-  // 	// { created: Date.now(), username: 'guest-' }
-  // });
+
+
+
+
+  socket.on('upload-notification', function(notification){
+  	console.log('notification', notification);
+    socket.broadcast.emit('push-notification', notification);
+  	// { created: Date.now(), username: 'guest-' }
+  });
+
   socket.on('disconnect', function(){
     client--;
     console.log('client-update', client);

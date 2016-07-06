@@ -2,13 +2,15 @@
 const config  = require("$custom/config");
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
-const socket  = require('$custom/sentinel').clent;
+const socket  = require("$custom/sentinel").client;
 const Q 				= require('q');
 const mongo 		= require("$custom/schema");
 const db 				= require("$custom/mysql").connect();
 const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
+
+socket.emit('no-client', {});
 
 module.exports = function(push) {
   push.accept(function(){
@@ -215,7 +217,7 @@ module.exports = function(push) {
 				$access.body = `logs ${RegexCommit} items saved.`;
     	}
     	$access.event = 'pushed';
-    	socket.emit('push-notification', $access);
+    	socket.emit('upload-notification', $access);
   		console.log(chalk.green(infoTime), `logs ${RegexCommit} items saved.`, $access.fullname, "push",chalk.green(push.repo, ':', push.branch));
     }).catch(function(ex){
     	console.log(chalk.red(infoTime), chalk.red('catch--logs'), ex);
@@ -223,3 +225,4 @@ module.exports = function(push) {
 
   });
 }
+ 
