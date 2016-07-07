@@ -2,7 +2,7 @@
 const config  = require("$custom/config");
 const control = require("$custom/touno-git").control;
 const auth 		= require("$custom/touno-git").auth;
-const socket  = require("$custom/sentinel").client;
+const socket  = require("$custom/sentinel").api();
 const Q 				= require('q');
 const mongo 		= require("$custom/schema");
 const db 				= require("$custom/mysql").connect();
@@ -10,7 +10,6 @@ const moment		= require("moment");
 const chalk 		= require('chalk');
 const path 			= require('path');
 
-socket.emit('no-client', {});
 
 module.exports = function(push) {
   push.accept(function(){

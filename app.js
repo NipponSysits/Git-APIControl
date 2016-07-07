@@ -46,8 +46,6 @@ io.on('connection', function(socket){
   });
 
 
-
-
   socket.on('checkin-stats', function(session){
     var sql = 'select count(*) as access from user ' +
               'where username=:username and md5(password)=:key';
@@ -62,13 +60,8 @@ io.on('connection', function(socket){
   	// { created: Date.now(), username: 'guest-' }
   });
 
-
-
-
   socket.on('upload-notification', function(notification){
-  	console.log('notification', notification);
     socket.broadcast.emit('push-notification', notification);
-  	// { created: Date.now(), username: 'guest-' }
   });
 
   socket.on('disconnect', function(){
