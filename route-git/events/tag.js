@@ -11,7 +11,7 @@ module.exports = function(tag) {
   var user = {};
   auth.username(tag.headers).then(function(us){
   	user = us;
-	  console.log(chalk.yellow(infoTime), "logs", user.fullname, "tag",chalk.cyan(repo));
+	  console.log(chalk.yellow(infoTime), "logs", user.fullname, "tag", chalk.cyan(repo));
 		return db.query('SELECT repository_id FROM repositories WHERE dir_name = :name', { name: tag.repo });
 	}).then(function(repo){
   	let repository_id = repo[0].repository_id;

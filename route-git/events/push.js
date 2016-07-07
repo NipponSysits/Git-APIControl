@@ -210,9 +210,7 @@ module.exports = function(push) {
 	    	});
 	  	}
     }).then(function(){
-    	if(RegexCommit <= 1) {
-				$access.body = `logs ${RegexCommit} items saved.`;
-    	} else {
+    	if(RegexCommit > 1) {
 				$access.body = `logs ${RegexCommit} items saved.`;
     	}
     	$access.event = 'pushed';
