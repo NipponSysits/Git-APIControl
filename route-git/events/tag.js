@@ -7,7 +7,7 @@ const chalk   	= require('chalk');
 
 module.exports = function(tag) {
   var repo = tag.repo.replace(/\//g, ' -> ').replace(/\.git/g, ' project.');
-  var infoTime = moment().format('HH:mm:ss, dddd');
+  var infoTime = moment().format(' HH:mm:ss');
   var user = {};
   auth.username(tag.headers).then(function(us){
   	user = us;

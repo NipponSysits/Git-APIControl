@@ -3,6 +3,7 @@
 const express = require('express')();
 const http 		= require("http").createServer(express);
 const moment  = require('moment');
+const chalk   = require('chalk');
 const config  = require('$custom/config');
 const mongo   = require("$custom/schema");
 const control = require("$custom/touno-git").control;
@@ -72,5 +73,6 @@ io.on('connection', function(socket){
 
 // Schedule Task //
 var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {  
-  console.log('Schedule:', new Date())
+  var infoTime = moment().format(' HH:mm:ss');
+  console.log(chalk.yellow(infoTime), 'Schedule:', new Date());
 }, null, true);
