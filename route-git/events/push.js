@@ -62,7 +62,7 @@ module.exports = function(push) {
     			comment: comment[1] || null, 
     		}
 
-				$access.body = commit_log[5].trim();
+				$access.body = (comment[2] || '').trim() || commit_log[5].trim();
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
@@ -104,14 +104,13 @@ module.exports = function(push) {
     		let CommitFile = git.match(/.*\n/ig) || [];
     		
 		    CommitFile.forEach(function(logs){
-		    	let filename = /\d{6}(.+)[a-f0-9]{40}([\s\d\-]+)(.*)/g.exec(logs);
+		    	let filename = /\d{6}(.+)[a-f0-9]{40}\s+?([\-\d]+)(.*)/g.exec(logs);
+
 		    	let type = filename[1].trim();
 		    	let size = filename[2].trim();
 		    	let name = filename[3].replace(/\n/g, '').trim();
 
-
 	    		$scopt.readme = new Buffer("");
-
 		    	if(name.toLowerCase() === 'readme.md') {
 		    		items.push(control.cmd('git', [ '--no-pager','show',$scopt.master+':'+name ], dirRepository).then(function(text){
 		    			$scopt.readme = text;
