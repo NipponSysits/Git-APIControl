@@ -26,7 +26,6 @@ git.listen();
 express.use('/api',[], api);
 express.get('/', function(req, res){ res.end(); });
 
-express.use("/", require('express').static(__dirname+'/asset'));
 http.listen(config.api, function() {
     console.log('API Server is listening on port ' + config.api + ' at ' + moment().format("HH:mm:ss"));
 });
