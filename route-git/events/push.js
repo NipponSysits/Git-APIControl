@@ -62,7 +62,7 @@ module.exports = function(push) {
     			comment: comment[1] || null, 
     		}
 
-				$access.body = (comment[2] || '').trim() || commit_log[5].trim();
+				$access.body = ((comment[2] || '').trim() || commit_log[5].trim());
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
