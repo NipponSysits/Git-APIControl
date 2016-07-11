@@ -1,9 +1,9 @@
-const moment  = require('moment');
-const chalk   = require('chalk');
-const config  = require('$custom/config');
-const mongo   = require("$custom/schema");
-const control = require("$custom/touno-git").control;
-const db      = require("$custom/mysql").connect();
+const moment   = require('moment');
+const chalk    = require('chalk');
+const config   = require('$custom/config');
+const mongo    = require("$custom/schema");
+const control  = require("$custom/touno-git").control;
+const db       = require("$custom/mysql").connect();
 
 var client = -1;
 
@@ -14,6 +14,13 @@ module.exports = function(socket){
   
   socket.on('no-client', function(){
     client--;
+  });
+
+  socket.on('web-client', function(session){
+		// var conn = mongoose.createConnection(process.env.MONGO_URL);
+		// conn.once('open', function() {
+			
+		// });
   });
 
   socket.on('checkin-stats', function(session){

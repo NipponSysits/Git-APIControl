@@ -35,7 +35,6 @@ http.listen(config.api, function() {
 const io = require( "socket.io" )(http);
 io.on('connection', require('./route-io/server'));
 
-
 // Schedule Task //
 var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {  
   var infoTime = moment().format(' HH:mm:ss');

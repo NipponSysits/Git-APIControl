@@ -1,3 +1,7 @@
 tmp/
 node_modules/*
 !node_modules/$custom
+asset/gravatar/32/
+asset/gravatar/64/
+asset/gravatar/128/
+asset/gravatar/256/
