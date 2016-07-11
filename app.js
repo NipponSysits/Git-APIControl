@@ -5,14 +5,11 @@ const http 		= require("http").createServer(express);
 const moment  = require('moment');
 const chalk   = require('chalk');
 const config  = require('$custom/config');
-const mongo   = require("$custom/schema");
-const control = require("$custom/touno-git").control;
-const db      = require("$custom/mysql").connect();
 const cron 		= require('cron');
 
 // const io      = require('socket.io').listen(api);
-const git     = require("./route-git/git-server");
-const api     = require("./route-api/api-server");
+const git     = require("./route-git/server");
+const api     = require("./route-api/server");
 
 console.log('arg', config.arg);
 
@@ -36,40 +33,8 @@ http.listen(config.api, function() {
 
 // LISTEN SOCKET API //
 const io = require( "socket.io" )(http);
+io.on('connection', require('./route-io/server'));
 
-var client = -1;
-io.on('connection', function(socket){
-  client++;
-  console.log('client-update', client);
-  
-  socket.on('no-client', function(){
-    client--;
-  });
-
-
-  socket.on('checkin-stats', function(session){
-    var sql = 'select count(*) as access from user ' +
-              'where username=:username and md5(password)=:key';
-    db.query(sql, session).then(function(user){
-      var checkin = parseInt(user[0].access) > 0 ? true : false;
-      socket.emit('checkin-stats', checkin);
-    }).catch(function(ex){
-      console.log('err-checkin-stats', ex);
-      socket.emit('checkin-stats', false);
-    });
-    
-  	// { created: Date.now(), username: 'guest-' }
-  });
-
-  socket.on('upload-notification', function(notification){
-    socket.broadcast.emit('push-notification', notification);
-  });
-
-  socket.on('disconnect', function(){
-    client--;
-    console.log('client-update', client);
-  });
-});
 
 // Schedule Task //
 var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {  
