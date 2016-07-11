@@ -3,6 +3,8 @@ const config  = require("$custom/config");
 const http    = require('http');
 const httpProxy = require('http-proxy');
 const Q 			= require('q');
+const fs      = require('fs');
+const path    = require('path');
 const moment 	= require('moment');
 const repos 	= require('pushover')(config.source, { autoCreate: false });
 
@@ -25,7 +27,20 @@ module.exports = {
             res.statusCode = 401;
             res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
             res.end();
-          }e
+          }
+        });
+      } else if(/(\d{2,3})\/([0-9a-f]{32})/g.test(req.url)) {
+        let file = /(\d{2,3})\/([0-9a-f]{32})/g.exec(req.url);
+
+        fs.readFile(`./asset/gravatar/${file[1]}/${file[2]}.png`, function(error, content) {
+          if (error) {
+            console.log('error', error);
+            res.writeHead(500);
+            res.end(); 
+          } else {
+            res.writeHead(200, { 'Content-Type': 'image/png' });
+            res.end(content, 'utf-8');
+          }
         });
       } else {
         proxy.web(req, res);
