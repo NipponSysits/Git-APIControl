@@ -10,8 +10,7 @@ var client = -1;
 module.exports = function(socket){
   var infoTime = moment().format(' HH:mm:ss');
   client++;
-  console.log('client-update', client);
-  
+
   socket.on('no-client', function(){
     client--;
   });
@@ -35,11 +34,11 @@ module.exports = function(socket){
   });
 
   socket.on('upload-notification', function(notification){
+    console.log('upload-notification');
     socket.broadcast.emit('push-notification', notification);
   });
 
   socket.on('disconnect', function(){
     client--;
-    console.log('client-update', client);
   });
 }
