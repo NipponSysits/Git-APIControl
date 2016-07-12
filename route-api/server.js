@@ -3,6 +3,7 @@
 const Q         = require('q');
 const fs 				= require('fs');
 const md5       = require('md5');
+const readline 	= require('readline');
 const db 				= require("$custom/mysql").connect();
 const request 	= require('request');
 const express   = require('express');
@@ -24,8 +25,8 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 			let writer = request(url).pipe(fs.createWriteStream(`${dir}${id}.png`));
 
 			writer.on('finish', () => { 
-			  process.stdout.clearLine();  // clear current text
-			  process.stdout.cursorTo(0);  // move cursor to beginning of line
+				readline.clearLine(process.stdout);
+    		readline.cursorTo(process.stdout, 0);
 				process.stdout.write(`[Avatar in Gravatar.com] downloading... ${((current*100)/(total*4)).toFixed(2)}% (${current}/${(total*4)})`); 
 				current++; 
 				def.resolve(); 
@@ -40,10 +41,10 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 	total = data.length;
 	data.forEach(function(item) {
 		let id = md5(item.email);
-		// download.push(reqGravatar(32, id));
-		// download.push(reqGravatar(64, id));
-		// download.push(reqGravatar(128, id));
-		// download.push(reqGravatar(256, id));
+		download.push(reqGravatar(32, id));
+		download.push(reqGravatar(64, id));
+		download.push(reqGravatar(128, id));
+		download.push(reqGravatar(256, id));
 	});
 
 	return Q.all(download);
