@@ -22,7 +22,7 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 		request.head(url, function(err, res, body){
 			var dir = __dirname+`/../asset/gravatar/${size}/`;
 			if(!fs.existsSync(dir)) { fs.mkdirSync(dir); }
-			let writer = request(url).pipe(fs.createWriteStream(`${dir}${id}.png`));
+			let writer = request(url).pipe(fs.createWriteStream(`${dir}${id}.jpg`));
 
 			writer.on('finish', () => { 
 				readline.clearLine(process.stdout);
@@ -32,7 +32,7 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 				def.resolve(); 
 			});
 			writer.on('error', () => {
-				console.log(`error ${size} '${id}.png`); 
+				console.log(`error ${size} '${id}.jpg`); 
 			});
 		});
 		return def.promise;

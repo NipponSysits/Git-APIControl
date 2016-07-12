@@ -32,13 +32,13 @@ module.exports = {
       } else if(/(\d{2,3})\/([0-9a-f]{32})/g.test(req.url)) {
         let file = /(\d{2,3})\/([0-9a-f]{32})/g.exec(req.url);
 
-        fs.readFile(`${__dirname}/../asset/gravatar/${file[1]}/${file[2]}.png`, function(error, content) {
+        fs.readFile(`${__dirname}/../asset/gravatar/${file[1]}/${file[2]}.jpg`, function(error, content) {
           if (error) {
             console.log('error', error);
             res.writeHead(500);
             res.end(); 
           } else {
-            res.writeHead(200, { 'Content-Type': 'image/png' });
+            res.writeHead(200, { 'Content-Type': 'image/jpg' });
             res.end(content, 'utf-8');
           }
         });
