@@ -147,7 +147,7 @@ module.exports = function(push) {
     		if(InsertEvent) {
 					let commited = new mongo.Repository($scopt);
 					commited.save(callback); 
-					console.log('mongo.Repository.save -- ', { repository_id: $scopt.repository_id });
+  				console.log(chalk.green(infoTime), `cache saved.`, { repository_id: $scopt.repository_id });
     		} else {
     			let updated = {
 						master: $scopt.master,
@@ -156,7 +156,7 @@ module.exports = function(push) {
 						files: $scopt.files
     			}
     			mongo.Repository.update({ repository_id: $scopt.repository_id }, { $set: updated }, callback);
-					console.log('mongo.Repository.update -- ', { repository_id: $scopt.repository_id });
+  				console.log(chalk.green(infoTime), `cache update.`, { repository_id: $scopt.repository_id });
     		}
     		return def.promise;
   		},
@@ -165,18 +165,26 @@ module.exports = function(push) {
 
 		auth.username(push.headers).then(function(user){
 			$access = user;
-
   		console.log(chalk.green(infoTime), "logs", $access.fullname, "push",chalk.green(push.repo, ':', push.branch));
-			return db.query('SELECT repository_id, title, description FROM repositories WHERE dir_name = :name', { name: push.repo })
+  		let sql  = `SELECT 
+  			r.repository_id, rs.title, rs.description, 
+  			r.private, r.anonymous, r.notify
+  		FROM repositories rs
+  		INNER JOIN repository r ON r.repository_id = rs.repository_id
+  		WHERE rs.dir_name = :name`
+			return db.query(sql, { name: push.repo })
 		}).then(function(repo){
 	    $scopt.repository_id = repo[0].repository_id;
 	    $scopt.name = push.repo;
 	    $scopt.title = repo[0].title;
   		$scopt.description = repo[0].description || '';
+	    $access.title = repo[0].title;
 			$access.repository_id = repo[0].repository_id;
 			$access.repo = push.repo;
 			$access.branch = push.branch;
-
+			$access.private = push.private === 'YES' ? true : false;
+			$access.anonymous = push.anonymous === 'YES' ? true : false;
+			$access.notify = push.notify === 'YES' ? true : false;
 
 	    var def = Q.defer();
 			var findCommits = mongo.Commit.findOne({ 'repository_id': $access.repository_id, logs: true }).sort({since : -1});
@@ -208,6 +216,13 @@ module.exports = function(push) {
     			return Q.all(regexLogs);
 	    	});
 	  	}
+    }).then(function(){
+    	// private, anonymous, notify, 
+    	let sql = `SELECT user_id	FROM repository_contributor WHERE repository_id = :repository_id`;
+			return db.query(sql, { repository_id: $access.repository_id }).then(function(contributor){
+	    	contributor.map(function(repo) { return repo.user_id; });
+	    	$access.permission = contributor;
+			});
     }).then(function(){
     	if(RegexCommit > 1) {
 				$access.body = `logs ${RegexCommit} items saved.`;
