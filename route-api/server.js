@@ -27,7 +27,7 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 			writer.on('finish', () => { 
 				readline.clearLine(process.stdout);
     		readline.cursorTo(process.stdout, 0);
-				process.stdout.write(`[Avatar in Gravatar.com] downloading... ${((current*100)/(total*4)).toFixed(2)}% (${current}/${(total*4)})`); 
+				process.stdout.write(`[Gravatar.com] Avatar downloading... ${((current*100)/(total*4)).toFixed(2)}% (${current}/${(total*4)})`); 
 				current++; 
 				def.resolve(); 
 			});
@@ -49,9 +49,9 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 
 	return Q.all(download);
 }).then(function(){
-  process.stdout.clearLine();  // clear current text
-  process.stdout.cursorTo(0);  // move cursor to beginning of line
-	process.stdout.write(`[Avatar in Gravatar.com] Successful.\n\r`); 
+	readline.clearLine(process.stdout);
+	readline.cursorTo(process.stdout, 0);
+	process.stdout.write(`[Gravatar.com] Successful.\n\r`); 
 }).catch(function(ex){
 	console.log('Gravatar download fail.');
 	console.log('ex', ex);
