@@ -30,13 +30,16 @@ module.exports = {
           }
         });
       } else if(/(\d{2,3})\/([0-9a-f]{32})/g.test(req.url)) {
-        let file = /(\d{2,3})\/([0-9a-f]{32})/g.exec(req.url);
+        let file = /(\d{2,3})\/([0-9a-f]{32})/g.exec(req. url);
+        let none = `${__dirname}/../asset/gravatar/${file[1]}/00000000000000000000000000000000.jpg`;
+        let avatar = `${__dirname}/../asset/gravatar/${file[1]}/${file[2]}.jpg`;
 
-        fs.readFile(`${__dirname}/../asset/gravatar/${file[1]}/${file[2]}.jpg`, function(error, content) {
+        fs.readFile(avatar, function(error, content) {
           if (error) {
-            console.log('error', error);
-            res.writeHead(500);
-            res.end(); 
+            fs.readFile(none, function(error, content) {
+              res.writeHead(200, { 'Content-Type': 'image/jpg' });
+              res.end(content, 'utf-8');
+            });
           } else {
             res.writeHead(200, { 'Content-Type': 'image/jpg' });
             res.end(content, 'utf-8');
