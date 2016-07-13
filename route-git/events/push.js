@@ -219,17 +219,16 @@ module.exports = function(push) {
     }).then(function(){
     	// private, anonymous, notify, 
     	let sql = `SELECT user_id	FROM repository_contributor WHERE repository_id = :repository_id`;
-			return db.query(sql, { repository_id: $access.repository_id }).then(function(contributor){
-	    	contributor.map(function(repo) { return repo.user_id; });
-	    	$access.permission = contributor;
-			});
-    }).then(function(){
-			$access.commits = 1;
-    	if(RegexCommit > 1) {
-				$access.body = `logs ${RegexCommit} items saved.`;
-				$access.commits = RegexCommit;
-    	}
+			return db.query(sql, { repository_id: $access.repository_id });
+    }).then(function(contributor){
     	$access.event = 'pushed';
+			$access.commits = RegexCommit;
+			$access.permission = [];
+    	contributor.forEach(function(repo) {
+    		$access.permission.push(repo.user_id)
+    	});
+    	if(RegexCommit > 1) $access.body = `logs ${RegexCommit} items saved.`;
+    	
     	socket.emit('upload-notification', $access);
   		console.log(chalk.green(infoTime), `logs ${RegexCommit} items saved.`, $access.fullname, "push",chalk.green(push.repo, ':', push.branch));
     }).catch(function(ex){
