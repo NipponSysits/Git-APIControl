@@ -56,13 +56,13 @@ module.exports = function(push) {
     			author: author[0],
     			email: author[1], 
     			since: new Date(commit_log[1]),
-    			parent_id: commit_log[3], 
+    			parent_id: commit_log[3].trim(), 
     			subject: comment[0], 
     			logs: true,
-    			comment: comment[1] || null, 
+    			comment: comment[1], 
     		}
 
-				$access.body = ((comment[2] || '').trim() || commit_log[5].trim());
+				$access.body = pushed.comment || pushed.subject;
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
@@ -82,7 +82,7 @@ module.exports = function(push) {
 							return false;
 						}
 					});
-					if(foundNewFile) {
+					if(foundNewFile || pushed.parent_id == '') {
 						return control.cmd('git', listBranch, dirRepository).then(function(branchs){
 							(branchs.match(/.*\n/ig) || []).forEach(function(item){
 								let branch = /(\W).\[(.*)\]/g.exec(item);
