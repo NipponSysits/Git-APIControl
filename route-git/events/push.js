@@ -182,9 +182,9 @@ module.exports = function(push) {
 			$access.repository_id = repo[0].repository_id;
 			$access.repo = push.repo;
 			$access.branch = push.branch;
-			$access.private = push.private === 'YES' ? true : false;
-			$access.anonymous = push.anonymous === 'YES' ? true : false;
-			$access.notify = push.notify === 'YES' ? true : false;
+			$access.private = repo[0].private === 'YES' ? true : false;
+			$access.anonymous = repo[0].anonymous === 'YES' ? true : false;
+			$access.notify = repo[0].notify === 'YES' ? true : false;
 
 	    var def = Q.defer();
 			var findCommits = mongo.Commit.findOne({ 'repository_id': $access.repository_id, logs: true }).sort({since : -1});
