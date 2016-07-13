@@ -8,9 +8,7 @@ const db       = require("$custom/mysql").connect();
 var client = -1;
 
 module.exports = function(socket){
-  var infoTime = moment().format(' HH:mm:ss');
   client++;
-
   socket.on('no-client', function(){
     client--;
   });
@@ -18,7 +16,6 @@ module.exports = function(socket){
   socket.on('web-client', function(session){
 		// var conn = mongoose.createConnection(process.env.MONGO_URL);
 		// conn.once('open', function() {
-			
 		// });
   });
 
@@ -34,7 +31,8 @@ module.exports = function(socket){
   });
 
   socket.on('upload-notification', function(notification){
-    console.log('upload-notification');
+    var infoTime = moment().format(' HH:mm:ss');
+    console.log(chalk.yellow(infoTime), "notification", notification.repo);
     socket.broadcast.emit('push-notification', notification);
   });
 

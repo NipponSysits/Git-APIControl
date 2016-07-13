@@ -224,8 +224,10 @@ module.exports = function(push) {
 	    	$access.permission = contributor;
 			});
     }).then(function(){
+			$access.commits = 1;
     	if(RegexCommit > 1) {
 				$access.body = `logs ${RegexCommit} items saved.`;
+				$access.commits = RegexCommit;
     	}
     	$access.event = 'pushed';
     	socket.emit('upload-notification', $access);
