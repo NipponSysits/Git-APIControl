@@ -83,7 +83,6 @@ module.exports = function(push) {
 						}
 					});
 					if(foundNewFile) {
-						console.log(' filename new -- update caches in mongodb');
 						return control.cmd('git', listBranch, dirRepository).then(function(branchs){
 							(branchs.match(/.*\n/ig) || []).forEach(function(item){
 								let branch = /(\W).\[(.*)\]/g.exec(item);
