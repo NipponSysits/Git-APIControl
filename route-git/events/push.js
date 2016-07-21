@@ -61,8 +61,9 @@ module.exports = function(push) {
     			logs: true,
     			comment: comment[1], 
     		}
-
-				$access.body = pushed.comment || pushed.subject;
+    		
+    		$access.email = author[1];
+				$access.body = pushed.subject + (pushed.comment ? '\n'+pushed.comment : '');
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
@@ -226,6 +227,7 @@ module.exports = function(push) {
     	contributor.forEach(function(repo) {
     		$access.permission.push(repo.user_id)
     	});
+    	if(RegexCommit < 1) $access.body = `branch '${push.branch}' has updated.`;
     	if(RegexCommit > 1) $access.body = `logs ${RegexCommit} items saved.`;
     	
     	socket.emit('upload-notification', $access);
