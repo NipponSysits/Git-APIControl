@@ -63,7 +63,9 @@ module.exports = function(push) {
     		}
     		
     		$access.email = author[1];
-				$access.body = pushed.subject + (pushed.comment ? '\n'+pushed.comment : '');
+				$access.fulltext = (pushed.subject || '') + (pushed.comment ? '\n' + pushed.comment : '');
+				$access.body = $access.fulltext.substr(0,52).trim()+'...';
+
 				let commited = new mongo.Commit(pushed);
 				commited.save(function (err, result) { if (err) def.reject(err); else def.resolve(pushed);	}); 
     		return def.promise;
