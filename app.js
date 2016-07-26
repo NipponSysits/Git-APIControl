@@ -10,6 +10,7 @@ const async 	= require('async-q');
 const db 		  = require("$custom/mysql").connect();
 
 // const io      = require('socket.io').listen(api);
+const control = require("$custom/touno-git").control;
 const git     = require("./route-git/server");
 const api     = require("./route-api/server");
 
@@ -41,11 +42,32 @@ var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {
   var infoTime = moment().format(' HH:mm:ss');
   console.log(chalk.yellow(infoTime), 'Schedule:', new Date());
 
-  var items = [];
-  db.select('repositories', { config: 'source' }).then(function(rows){
-    rows.forEach(function(row){ items.push(git.backup.bind(this, row.dir_name, row.bundle)); });
-    return async.series(items);
-  }).then(function(results){
-		console.log(`Total ${items.length} Tasks Successful`); // (${(totalTime/1000).toFixed(2)}s)
-	});
+
 }, null, true);
+console.log(`Schedule Tasks Strining...`);
+
+var items = [], totalGit = 0;
+db.select('repositories', { config: 'source' }).then(function(rows){
+  rows.forEach(function(row){ items.push(function(){
+    let bundleCreate = [ 'bundle','create', `../../../../${config.bundle}/${row.bundle}` ,'--all' ];
+    let bundleVerify = [ 'bundle','verify', `../../../../${config.bundle}/${row.bundle}` ];
+    let dir_source = `${__dirname+config.source}/${row.dir_name}`;
+    return control.cmd('git', ['branch'], dir_source).then(function(msg){
+      if(msg.trim() !== '') {
+        totalGit++;
+        return control.cmd('git', bundleCreate, dir_source);
+      } else {
+        throw undefined;
+      }
+    }).catch(function(ex){
+      if(typeof 'object' == ex) {
+        console.log(row.bundle, '--', ex.error);
+      }
+    });
+  }); });
+  return async.series(items);
+}).then(function(results){
+  console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
+}).catch(function(ex){
+  console.log(ex);
+});

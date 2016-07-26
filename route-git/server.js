@@ -86,12 +86,7 @@ module.exports = {
 
   },
   backup: function(dir, bundle_name){
-    return control.cmd('git', [ 'bundle','create', `${config.bundle}/${bundle_name}` ,'--all' ], dir).then(function(){
-      return control.cmd('git', [ 'bundle','verify', bundle_name ], config.bundle);
-    }).then(function(verify){
-      console.log(bundle_name);
-      console.log(verify);
-    });
+
   },
   restore: function() {
     
