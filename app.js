@@ -6,6 +6,8 @@ const moment  = require('moment');
 const chalk   = require('chalk');
 const config  = require('$custom/config');
 const cron 		= require('cron');
+const async 	= require('async-q');
+const db 		  = require("$custom/mysql").connect();
 
 // const io      = require('socket.io').listen(api);
 const git     = require("./route-git/server");
@@ -33,9 +35,17 @@ http.listen(config.api, function() {
 // LISTEN SOCKET API //
 const io = require( "socket.io" )(http);
 io.on('connection', require('./route-io/server'));
-
+ 
 // Schedule Task //
-var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {  
+var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {
   var infoTime = moment().format(' HH:mm:ss');
   console.log(chalk.yellow(infoTime), 'Schedule:', new Date());
+
+  var items = [];
+  db.select('repositories', { config: 'source' }).then(function(rows){
+    rows.forEach(function(row){ items.push(git.backup.bind(this, row.dir_name, row.bundle)); });
+    return async.series(items);
+  }).then(function(results){
+		console.log(`Total ${items.length} Tasks Successful`); // (${(totalTime/1000).toFixed(2)}s)
+	});
 }, null, true);
