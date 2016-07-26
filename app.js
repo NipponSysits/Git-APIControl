@@ -49,9 +49,9 @@ console.log(`Schedule Tasks Strining...`);
 var items = [], totalGit = 0;
 db.select('repositories', { config: 'source' }).then(function(rows){
   rows.forEach(function(row){ items.push(function(){
-    let bundleCreate = [ 'bundle','create', `../../../../${config.bundle}/${row.bundle}` ,'--all' ];
-    let bundleVerify = [ 'bundle','verify', `../../../../${config.bundle}/${row.bundle}` ];
-    let dir_source = `${__dirname+config.source}/${row.dir_name}`;
+    let bundleCreate = [ 'bundle','create', `${config.bundle}/${row.bundle}` ,'--all' ];
+    let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
+    let dir_source = `${config.source}/${row.dir_name}`;
     return control.cmd('git', ['branch'], dir_source).then(function(msg){
       if(msg.trim() !== '') {
         totalGit++;
