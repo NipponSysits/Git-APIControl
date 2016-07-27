@@ -69,19 +69,10 @@ module.exports = {
     repos.on('head', require('./events/head'));
     repos.on('response', require('./events/response'));
 
-    db.select('repositories', {}).then(function(rows){
-      var items = [];
-      rows.forEach(function(row){ items.push(control.create(row)); });
-      return Q.all(items);
-    }).then(function(){
-      // SERVER SOURCECONTROL //
-      git.listen(config.git, function() {
-        console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("HH:mm:ss"));
-        // console.log('sample:', 'http://'+config.domain+':'+config.git+'/collection/product-test.git');
-      });
-    }).catch(function(ex){
-      db.end();
-      console.log('error:', ex);
+    // SERVER SOURCECONTROL //
+    git.listen(config.git, function() {
+      console.log('SourceControl listening on port ' + config.git + ' at ' + moment().format("HH:mm:ss"));
+      // console.log('sample:', 'http://'+config.domain+':'+config.git+'/collection/product-test.git');
     });
 
   },
