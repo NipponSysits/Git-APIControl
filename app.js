@@ -39,34 +39,34 @@ io.on('connection', require('./route-io/server'));
  
 
 // Schedule Task Restore //
-// let items = [], totalGit = 0;
-// db.select('repositories', { config: 'source' }).then(function(rows){
-//   let unbundleProject = function(row){
-//     let bundleUnbundle = [ 'bundle','unbundle', `${config.bundle}\\${row.bundle}` ,'--all' ];
-//     let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
-//     let dir_source = `${config.source}/${row.dir_name}`;
-//     return control.cmd('git', bundleVerify, dir_source).then(function(msg){
-//       if(/The bundle records a complete history/g.test(msg)) {
-//         totalGit++;
-//         return control.cmd('git', bundleUnbundle, dir_source);
-//       } else {
-//         throw {};
-//       }
-//     }).catch(function(ex){
-//       console.log(row.title, '-- empty repository -- ', row.dir_name);
-//       console.log(ex.error);
-//     });
-//   }
+let items = [], totalGit = 0;
+db.select('repositories', { config: 'source' }).then(function(rows){
+  let unbundleProject = function(row){
+    let bundleUnbundle = [ 'bundle','unbundle', `${config.bundle}\\${row.bundle}` ,'--all' ];
+    let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
+    let dir_source = `${config.source}/${row.dir_name}`;
+    return control.cmd('git', bundleVerify, dir_source).then(function(msg){
+      if(/The bundle records a complete history/g.test(msg)) {
+        totalGit++;
+        return control.cmd('git', bundleUnbundle, dir_source);
+      } else {
+        throw {};
+      }
+    }).catch(function(ex){
+      console.log(row.title, '-- empty repository -- ', row.dir_name);
+      console.log(ex.error);
+    });
+  }
 
-//   rows.forEach(function(row){ 
-//     items.push(function(){ return unbundleProject(row); }); 
-//   });
-//   return async.series(items);
-// }).then(function(results){
-//   console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
-// }).catch(function(ex){
-//   console.log(ex);
-// });
+  rows.forEach(function(row){ 
+    items.push(function(){ return unbundleProject(row); }); 
+  });
+  return async.series(items);
+}).then(function(results){
+  console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
+}).catch(function(ex){
+  console.log(ex);
+});
 
 
 // Schedule Task Backup //
