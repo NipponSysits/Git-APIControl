@@ -50,11 +50,10 @@ db.select('repositories', { config: 'source' }).then(function(rows){
     let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
     let dir_source = `${config.source}/${row.dir_name}`;
 
-    let bundleUnbundle = [ 'clone',`${config.bundle}/${row.bundle}`, dir_source,'--bare' ];
-    return control.cmd('git', bundleVerify, config.source).then(function(msg){
+    return control.cmd('git', bundleVerify, dir_source).then(function(msg){
       if(/The bundle records a complete history/g.test(msg)) {
         totalGit++;
-        return control.cmd('git', bundleUnbundle, dir_source);
+        return control.cmd('git', [ 'clone',`${config.bundle}/${row.bundle}`, dir_source, '--bare' ], config.source);
       } else {
         throw {};
       }
