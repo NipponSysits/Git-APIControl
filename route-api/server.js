@@ -41,10 +41,10 @@ db.query(`SELECT email FROM user_email`).then(function(data){
 	total = data.length;
 	data.forEach(function(item) {
 		let id = md5(item.email);
-		// download.push(reqGravatar(32, id));
-		// download.push(reqGravatar(64, id));
-		// download.push(reqGravatar(128, id));
-		// download.push(reqGravatar(256, id));
+		download.push(reqGravatar(32, id));
+		download.push(reqGravatar(64, id));
+		download.push(reqGravatar(128, id));
+		download.push(reqGravatar(256, id));
 	});
 
 	return Q.all(download);
