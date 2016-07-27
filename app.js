@@ -37,37 +37,76 @@ http.listen(config.api, function() {
 const io = require( "socket.io" )(http);
 io.on('connection', require('./route-io/server'));
  
-// Schedule Task //
+
+// Schedule Task Restore //
+// let items = [], totalGit = 0;
+// db.select('repositories', { config: 'source' }).then(function(rows){
+//   let unbundleProject = function(row){
+//     let bundleUnbundle = [ 'bundle','unbundle', `${config.bundle}\\${row.bundle}` ,'--all' ];
+//     let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
+//     let dir_source = `${config.source}/${row.dir_name}`;
+//     return control.cmd('git', bundleVerify, dir_source).then(function(msg){
+//       if(/The bundle records a complete history/g.test(msg)) {
+//         totalGit++;
+//         return control.cmd('git', bundleUnbundle, dir_source);
+//       } else {
+//         throw {};
+//       }
+//     }).catch(function(ex){
+//       console.log(row.title, '-- empty repository -- ', row.dir_name);
+//       console.log(ex.error);
+//     });
+//   }
+
+//   rows.forEach(function(row){ 
+//     items.push(function(){ return unbundleProject(row); }); 
+//   });
+//   return async.series(items);
+// }).then(function(results){
+//   console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
+// }).catch(function(ex){
+//   console.log(ex);
+// });
+
+
+// Schedule Task Backup //
 var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {
   var infoTime = moment().format(' HH:mm:ss');
-  console.log(chalk.yellow(infoTime), 'Schedule:', new Date());
+  console.log(chalk.yellow(infoTime), 'Schedule:', new Date(), `Tasks Starting...`);
 
+  let items = [], totalGit = 0;
+  db.select('repositories', { config: 'source' }).then(function(rows){
+    let bundleProject = function(row){
+      let bundleCreate = [ 'bundle','create', `${config.bundle}/${row.bundle}` ,'--all' ];
+      let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
+      let dir_source = `${config.source}/${row.dir_name}`;
 
-}, null, true);
-console.log(`Schedule Tasks Strining...`);
+      return control.cmd('git', ['branch'], dir_source).then(function(msg){
+        if(msg.trim() !== '') {
+          totalGit++;
+          return control.cmd('git', bundleCreate, dir_source);
+        } else {
+          throw undefined;
+        }
+      }).catch(function(ex){
+        if(typeof 'object' == ex) { console.log(row.bundle, '--', ex.error); }
+      });
+    }
 
-var items = [], totalGit = 0;
-db.select('repositories', { config: 'source' }).then(function(rows){
-  rows.forEach(function(row){ items.push(function(){
-    let bundleCreate = [ 'bundle','create', `${config.bundle}/${row.bundle}` ,'--all' ];
-    let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
-    let dir_source = `${config.source}/${row.dir_name}`;
-    return control.cmd('git', ['branch'], dir_source).then(function(msg){
-      if(msg.trim() !== '') {
-        totalGit++;
-        return control.cmd('git', bundleCreate, dir_source);
-      } else {
-        throw undefined;
-      }
-    }).catch(function(ex){
-      if(typeof 'object' == ex) {
-        console.log(row.bundle, '--', ex.error);
-      }
+    rows.forEach(function(row){ 
+      items.push(function(){ return bundleProject(row); }); 
     });
-  }); });
-  return async.series(items);
-}).then(function(results){
-  console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
-}).catch(function(ex){
-  console.log(ex);
-});
+    return async.series(items);
+  }).then(function(results){
+    console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
+  }).catch(function(ex){
+    console.log(ex);
+  });
+}, null, true);
+
+
+
+// let bundle_id = md5(Math.random());
+// db.update('repository', { bundle_id: bundle_id }, { repository_id: row.repository_id }).catch(function(ex){
+//   console.log('update --', ex);
+// });
