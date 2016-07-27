@@ -6,6 +6,7 @@ const moment  = require('moment');
 const chalk   = require('chalk');
 const config  = require('$custom/config');
 const cron    = require('cron');
+const Q       = require('q');
 const async   = require('async-q');
 const db      = require("$custom/mysql").connect();
 
@@ -42,31 +43,31 @@ io.on('connection', require('./route-io/server'));
 let items = [], totalGit = 0;
 db.select('repositories', { config: 'source' }).then(function(rows){
 
-  // var items = [];
-  // rows.forEach(function(row){ items.push(control.create(row)); });
-  // return Q.all(items);
+  rows.forEach(function(row){ items.push(control.create(row)); });
+  return Q.all(items);
 
-  let unbundleProject = function(row){
-    let bundleVerify = [ 'bundle','verify', `${config.bundle}/${row.bundle}` ];
-    let dir_source = `${config.source}/${row.dir_name}`;
+  // let unbundleProject = function(row){
+  //   let dir_source = `${config.source}/${row.dir_name}`;
+  //   let bundleClone = ['clone',`${config.bundle}/${row.bundle}`,dir_source,'--bare']
 
-    return control.cmd('git', bundleVerify, dir_source).then(function(msg){
-      if(/The bundle records a complete history/g.test(msg)) {
-        totalGit++;
-        return control.cmd('git', [ 'clone',`${config.bundle}/${row.bundle}`, dir_source, '--bare' ], config.source);
-      } else {
-        throw {};
-      }
-    }).catch(function(ex){
-      console.log('-- empty repository -- ', row.dir_name);
-      console.log(ex.error);
-    });
-  }
+  //   return control.cmd('git', [ 'bundle','verify', `${row.bundle}` ], config.bundle).then(function(msg){
+  //     if(/The bundle records a complete history/g.test(msg)) {
+  //       totalGit++;
+  //       return control.cmd('git', bundleClone, config.source);
+  //     } else {
+  //       throw {};
+  //     }
+  //   }).catch(function(ex){
+  //     console.log('-- empty repository -- ', row.dir_name);
+  //     console.log(ex.error);
+  //   });
+  // }
 
-  rows.forEach(function(row){ 
-    items.push(function(){ return unbundleProject(row); }); 
-  });
-  return async.series(items);
+  // rows.forEach(function(row){ 
+  //   items.push(function(){ return unbundleProject(row); }); 
+  // });
+  // return async.series(items);
+
 }).then(function(results){
   console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
 }).catch(function(ex){
