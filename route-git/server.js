@@ -14,9 +14,8 @@ const db 		  = require("$custom/mysql").connect();
 
 module.exports = { 
   listen: function(){
-    var proxy = new httpProxy.createProxyServer({
-      target: { host: 'local-web', port: 4567, ws: true }
-    });
+    var target = { host: 'local-web', port: 4567, ws: true };
+    var proxy = new httpProxy.createProxyServer({ target: target });
 
     var git = http.createServer(function (req, res) {
       if(!/Mozilla\/[0-9\.]+/ig.exec(req.headers['user-agent'])) {
@@ -49,7 +48,9 @@ module.exports = {
         proxy.web(req, res);
         proxy.on('error', function (err, req, res) {
           res.writeHead(500, {
-            'Content-Type': 'text/plain'
+            'Content-Type': 'text/plain',
+            'proxy-host': target.host,
+            'proxy-port': target.port
           });
 
           res.end('Something went wrong. And we are reporting a custom error message.');
