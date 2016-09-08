@@ -14,7 +14,7 @@ const db 		  = require("$custom/mysql").connect();
 
 module.exports = { 
   listen: function(){
-    var target = { host: 'local-web', port: 4567, ws: true };
+    var target = { host: 'local-web', port: 3000, ws: true };
     var proxy = new httpProxy.createProxyServer({ target: target });
 
     var git = http.createServer(function (req, res) {
