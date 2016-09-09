@@ -8,6 +8,8 @@ const db       = require("$custom/mysql").connect();
 var client = -1;
 
 module.exports = function(socket){
+  let dbmysql = require('./async/db-mysql.js')(socket);
+  
   client++;
   socket.on('no-client', function(){
     client--;
