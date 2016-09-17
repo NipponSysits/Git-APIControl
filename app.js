@@ -8,6 +8,7 @@ const config  = require('$custom/config');
 const cron    = require('cron');
 const Q       = require('q');
 const async   = require('async-q');
+const md5     = require('md5');
 const db      = require("$custom/mysql").connect();
 
 // const io      = require('socket.io').listen(api);
@@ -38,48 +39,15 @@ http.listen(config.api, function() {
 const io = require( "socket.io" )(http);
 io.on('connection', require('./route-io/server'));
  
-
-// Schedule Task Restore //
-let items = [], totalGit = 0;
-db.select('repositories', { config: 'source' }).then(function(rows){
-
-  rows.forEach(function(row){ items.push(control.create(row)); });
-  return Q.all(items);
-
-  // let unbundleProject = function(row){
-  //   let dir_source = `${config.source}/${row.dir_name}`;
-  //   let bundleClone = ['clone',`${config.bundle}/${row.bundle}`,dir_source,'--bare']
-
-  //   return control.cmd('git', [ 'bundle','verify', `${row.bundle}` ], config.bundle).then(function(msg){
-  //     if(/The bundle records a complete history/g.test(msg)) {
-  //       totalGit++;
-  //       return control.cmd('git', bundleClone, config.source);
-  //     } else {
-  //       throw {};
-  //     }
-  //   }).catch(function(ex){
-  //     console.log('-- empty repository -- ', row.dir_name);
-  //     console.log(ex.error);
-  //   });
-  // }
-
-  // rows.forEach(function(row){ 
-  //   items.push(function(){ return unbundleProject(row); }); 
-  // });
-  // return async.series(items);
-
-}).then(function(results){
-  console.log(`Schedule Tasks (${totalGit} of ${items.length}) Successful`); // (${(totalTime/1000).toFixed(2)}s)
-}).catch(function(ex){
-  console.log(ex);
-});
-
-
 // Schedule Task Backup //
 var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {
   var infoTime = moment().format(' HH:mm:ss');
   console.log(chalk.yellow(infoTime), 'Schedule:', new Date(), `Tasks`);
 
+  // let bundle_id = md5(Math.random());
+  // db.update('repository', { bundle_id: bundle_id }, { repository_id: row.repository_id }).catch(function(ex){
+  //   console.log('update --', ex);
+  // });
   // let items = [], totalGit = 0;
   // db.select('repositories', { config: 'source' }).then(function(rows){
   //   let bundleProject = function(row){
@@ -113,6 +81,6 @@ var bundleSchedule = new cron.CronJob('00 30 6,18 * * 1-5', function() {
 
 
 // let bundle_id = md5(Math.random());
-// db.update('repository', { bundle_id: bundle_id }, { repository_id: row.repository_id }).catch(function(ex){
+// db.update('repository', { bundle_id: bundle_id }, { repository_id: row.repository_id, bundle_id: null }).catch(function(ex){
 //   console.log('update --', ex);
 // });
