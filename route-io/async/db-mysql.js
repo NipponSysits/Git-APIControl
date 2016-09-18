@@ -8,7 +8,7 @@ const async    = require('async-q');
 const Q        = require('q');
 
 let dbname = 'debugerr';
-module.exports = function(socket) {
+module.exports = function() {
   let dbTasks = [], objTasks = [], repos = [], totalGit = 0;
   let sql = `
   SELECT TABLE_NAME name FROM information_schema.tables
