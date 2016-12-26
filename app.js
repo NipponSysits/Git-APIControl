@@ -19,8 +19,8 @@ const api     = require("./route-api/server");
 console.log('arg', config.arg);
 
 process.env['PATH'] = process.env['PATH'] + ';' + config.core + ';' + config.lfs
-if(!/^6\./.exec(process.versions.node)) {
-  console.log('\nNode version is not 6.x.x');
+if(!/^7\./.exec(process.versions.node)) {
+  console.log('\nNode version is not 7.x.x');
   process.exit()
 }
 
